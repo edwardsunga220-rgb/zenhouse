@@ -37,20 +37,40 @@ from io import BytesIO
 import qrcode
 from django.http import HttpResponse
 from django.urls import reverse
+import qrcode
+from io import BytesIO
+from django.http import HttpResponse
+from django.urls import reverse
 
 def qr_home(request):
     """
     Generate a QR code that opens the Home Page automatically.
-    Uses request.build_absolute_uri() so no IP/domain is hardcoded.
+    Uses build_absolute_uri to ensure it includes 'https://zenihouse.pythonanywhere.com'
     """
+    # Use 'property_list' or whatever your home page name is in urls.py
     home_url = request.build_absolute_uri(reverse('property_list'))
 
-    qr_img = qrcode.make(home_url)
+    # Optional: Force HTTPS if the server environment is tricky
+    if not home_url.startswith('https') and not settings.DEBUG:
+        home_url = home_url.replace('http', 'https', 1)
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(home_url)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    
     buffer = BytesIO()
-    qr_img.save(buffer, format="PNG")
+    img.save(buffer, format="PNG")
     buffer.seek(0)
 
     return HttpResponse(buffer.getvalue(), content_type="image/png")
+
 
 def home(request):
     # Latest 8 maps for the carousel

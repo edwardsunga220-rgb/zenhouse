@@ -19,6 +19,9 @@ INSTALLED_APPS = [
     'zenmap',
     'widget_tweaks',
     'django.contrib.humanize',
+    'ckeditor',
+    'ckeditor_uploader',
+
 ]
 
 MIDDLEWARE = [
@@ -55,8 +58,8 @@ WSGI_APPLICATION = 'zenhouse.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': config("DB_ENGINE", default="django.db.backends.sqlite3"),
-        'NAME': BASE_DIR / config("DB_NAME", default="db.sqlite3") 
-                 if config("DB_ENGINE", default="django.db.backends.sqlite3") == "django.db.backends.sqlite3" 
+        'NAME': BASE_DIR / config("DB_NAME", default="db.sqlite3")
+                 if config("DB_ENGINE", default="django.db.backends.sqlite3") == "django.db.backends.sqlite3"
                  else config("DB_NAME"),
         'USER': config("DB_USER", default=""),
         'PASSWORD': config("DB_PASSWORD", default=""),
@@ -92,3 +95,8 @@ LOGOUT_REDIRECT_URL = config("LOGOUT_REDIRECT_URL", default="login")
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'info@zenhouse.co.tz'
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_RESTRICT_BY_USER = True  # Optional: users only see their own uploads
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
