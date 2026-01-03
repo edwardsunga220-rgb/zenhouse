@@ -1,0 +1,400 @@
+{% extends 'map/base.html' %}
+{% load static %}
+
+{% block title %}Search Results | ZenHouse{% endblock %}
+
+{% block content %}
+
+<style>
+  .search-page {
+    background: #f3f4f6;
+    padding: 3.5rem 0 3rem;
+  }
+
+  .search-page h2 {
+    color: #0f172a;
+    font-weight: 650;
+  }
+
+  .search-subtitle {
+    font-size: 0.95rem;
+    color: #6b7280;
+  }
+
+  .search-query-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    font-size: 0.85rem;
+    color: #0f172a;
+  }
+
+  .search-query-chip i {
+    color: var(--zen-primary-soft, #2c9a8e);
+  }
+
+  /* CARD */
+  .search-card {
+    border-radius: 18px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+    position: relative;
+  }
+
+  .search-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.24);
+    border-color: rgba(56, 189, 248, 0.6);
+  }
+
+  .search-card-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+
+  .search-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+    display: block;
+  }
+
+  .search-card:hover .search-card-img {
+    transform: scale(1.06);
+  }
+
+  .no-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+
+  .search-badge-category {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    background: rgba(15, 23, 42, 0.9);
+    color: #e5fdf9;
+    backdrop-filter: blur(10px);
+  }
+
+  .search-badge-price {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    background: rgba(56, 189, 248, 0.15);
+    color: #0f172a;
+    border: 1px solid rgba(56, 189, 248, 0.7);
+  }
+
+  .search-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.86), transparent 55%);
+    opacity: 0;
+    color: #f9fafb;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 0.75rem 0.9rem;
+    transition: opacity 0.3s ease;
+  }
+
+  .search-card:hover .search-overlay {
+    opacity: 1;
+  }
+
+  .search-overlay h5 {
+    font-size: 0.96rem;
+    font-weight: 600;
+    margin-bottom: 0.1rem;
+  }
+
+  .search-overlay small {
+    font-size: 0.78rem;
+    opacity: 0.9;
+  }
+
+  .search-card-meta {
+    padding: 0.65rem 0.9rem 0.85rem;
+    border-top: 1px solid rgba(229, 231, 235, 0.9);
+  }
+
+  .icon-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: #4b5563;
+  }
+
+  .icon-item {
+    text-align: center;
+    min-width: 60px;
+  }
+
+  .icon-item i {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 2px;
+    color: var(--zen-primary-soft, #2c9a8e);
+  }
+
+  /* NO RESULTS */
+  .no-results-box {
+    max-width: 480px;
+    margin: 3rem auto 1rem;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 2.4rem 1.6rem;
+    box-shadow: 0 14px 36px rgba(15, 23, 42, 0.18);
+    border: 1px dashed rgba(148, 163, 184, 0.7);
+  }
+
+  .no-results-box h5 {
+    font-size: 1.35rem;
+    color: #111827;
+    margin-bottom: 0.5rem;
+  }
+
+  .no-results-box p {
+    font-size: 0.93rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+  }
+
+  .btn-zen-ghost {
+    border-radius: 999px;
+    border: 1px solid var(--zen-primary-soft, #2c9a8e);
+    font-size: 0.9rem;
+    padding: 0.45rem 1.4rem;
+    color: var(--zen-primary-soft, #2c9a8e);
+    background: transparent;
+  }
+
+  .btn-zen-ghost:hover {
+    background: var(--zen-primary-soft, #2c9a8e);
+    color: #f9fafb;
+  }
+
+  /* PAGINATION */
+  .search-pagination {
+    margin-top: 2rem;
+  }
+
+  .search-pagination .page-link-like {
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.85rem;
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    color: #0f172a;
+    background: #f9fafb;
+    text-decoration: none;
+  }
+
+  .search-pagination .page-link-like.disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .search-pagination .page-number {
+    font-size: 0.85rem;
+    margin: 0 0.18rem;
+  }
+
+  .search-pagination .page-number.current {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--zen-primary-soft, #2c9a8e), var(--zen-primary, #10736f));
+    color: #f9fafb;
+    font-weight: 600;
+  }
+
+  .search-pagination .page-number a {
+    color: #0f172a;
+    text-decoration: none;
+    padding: 0.15rem 0.4rem;
+    border-radius: 999px;
+  }
+
+  .search-pagination .page-number a:hover {
+    background: rgba(148, 163, 184, 0.25);
+  }
+
+  @media (max-width: 575.98px) {
+    .search-page {
+      padding-top: 2.8rem;
+    }
+  }
+</style>
+
+<section class="search-page">
+  <div class="container">
+    <div class="mb-4 text-center">
+      <h2 class="fw-bold">Search Results</h2>
+      {% if query %}
+        <p class="search-subtitle mb-1">
+          Showing matching house plans for your search.
+        </p>
+        <div class="search-query-chip">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>{{ query }}</span>
+        </div>
+      {% else %}
+        <p class="search-subtitle">Browse results based on your last selection.</p>
+      {% endif %}
+    </div>
+
+    {% if results and results.object_list %}
+      <div class="row g-4">
+        {% for map in results %}
+          <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+            <div class="search-card">
+              <a href="{% url 'map_detail' map.id %}" class="d-block">
+
+                <div class="search-card-img-wrapper">
+                  {% if map.image %}
+                    <img src="{{ map.image.url }}" alt="{{ map.title }}" class="search-card-img">
+                  {% else %}
+                    <div class="no-image-placeholder">
+                      No Image
+                    </div>
+                  {% endif %}
+
+                  <span class="search-badge-category">
+                    {{ map.get_category_display }}
+                  </span>
+
+                  {% if map.price %}
+                  <span class="search-badge-price">
+                    TZS {{ map.price|floatformat:0 }}
+                  </span>
+                  {% endif %}
+
+                  <div class="search-overlay">
+                    <div>
+                      <h5 class="fw-semibold mb-0">{{ map.title }}</h5>
+                      <small>
+                        {% if map.square_meters %}{{ map.square_meters }} m²{% endif %}
+                        {% if map.number_of_bedrooms %} • {{ map.number_of_bedrooms }} Bed{% if map.number_of_bedrooms|add:0 != 1 %}s{% endif %}{% endif %}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+              </a>
+
+              <div class="search-card-meta">
+                <div class="d-flex justify-content-between align-items-center text-muted flex-wrap icon-row">
+                  {% if map.number_of_bedrooms %}
+                  <div class="icon-item">
+                    <i class="fa-solid fa-bed"></i>
+                    <div>{{ map.number_of_bedrooms }} Bed{% if map.number_of_bedrooms|add:0 != 1 %}s{% endif %}</div>
+                  </div>
+                  {% endif %}
+
+                  {% if map.number_of_bathrooms %}
+                  <div class="icon-item">
+                    <i class="fa-solid fa-bath"></i>
+                    <div>{{ map.number_of_bathrooms }} Bath{% if map.number_of_bathrooms|add:0 != 1 %}s{% endif %}</div>
+                  </div>
+                  {% endif %}
+
+                  {% if map.number_of_floors %}
+                  <div class="icon-item">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <div>{{ map.number_of_floors }} Floor{% if map.number_of_floors|add:0 != 1 %}s{% endif %}</div>
+                  </div>
+                  {% endif %}
+
+                  {% if map.square_meters %}
+                  <div class="icon-item">
+                    <i class="fa-solid fa-vector-square"></i>
+                    <div>{{ map.square_meters }} m²</div>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if results.has_other_pages %}
+      <nav aria-label="Page navigation" class="search-pagination d-flex justify-content-center align-items-center gap-2 flex-wrap">
+        {% if results.has_previous %}
+          <a href="?q={{ query }}&page={{ results.previous_page_number }}" class="page-link-like">
+            &lsaquo;
+          </a>
+        {% else %}
+          <span class="page-link-like disabled">&lsaquo;</span>
+        {% endif %}
+
+        {% for num in results.paginator.page_range %}
+          {% if num == results.number %}
+            <span class="page-number current">{{ num }}</span>
+          {% else %}
+            <span class="page-number">
+              <a href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+            </span>
+          {% endif %}
+        {% endfor %}
+
+        {% if results.has_next %}
+          <a href="?q={{ query }}&page={{ results.next_page_number }}" class="page-link-like">
+            &rsaquo;
+          </a>
+        {% else %}
+          <span class="page-link-like disabled">&rsaquo;</span>
+        {% endif %}
+      </nav>
+      {% endif %}
+
+    {% else %}
+      <div class="no-results-box">
+        <h5>No results found</h5>
+        <p>
+          We couldn’t find any house plans matching
+          {% if query %}<strong>“{{ query }}”</strong>{% else %}your search{% endif %}.
+          Try different keywords or adjust your filters.
+        </p>
+        <a href="{% url 'home' %}" class="btn btn-zen-ghost">
+          <i class="fa-solid fa-arrow-left-long me-1"></i>
+          Back to Home
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

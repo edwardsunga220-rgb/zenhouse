@@ -1,0 +1,21 @@
+{
+  "name": "ZenHouse",
+  "short_name": "ZenHouse",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10736f",
+  "description": "Modern House Plans Application",
+  "icons": [
+    {
+      "src": "/static/video/zenlogo1.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/video/zenlogo1.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

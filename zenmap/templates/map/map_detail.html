@@ -1,0 +1,259 @@
+{% extends 'map/base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block title %} {{ map.title }} | ZenHouse {% endblock %}
+
+{% block content %}
+
+<!-- Assets -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+
+<!-- Essential Interactive CSS (Cannot be inline) -->
+<style>
+  :root {
+    --zp: #0f766e;
+    --zph: #115e59;
+    --za: #2dd4bf;
+    --zd: #0f172a;
+    --zb: #475569;
+    --zs: #f8fafc;
+    --zrad: 8px;
+    --zshad: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --zshad-h: 0 20px 25px -5px rgba(0,0,0,0.1);
+  }
+
+  /* Breadcrumb Hover */
+  .crumb-link:hover { color: var(--zp) !important; }
+
+  /* Map Card Layout */
+  .map-workspace { display: flex; flex-wrap: wrap; background: #fff; border-radius: 8px; box-shadow: var(--zshad); border: 1px solid #cbd5e1; overflow: hidden; }
+  
+  /* Buttons Hover */
+  .btn-action-primary:hover { background: var(--zph) !important; color: #fff !important; transform: translateY(-2px); }
+  .btn-action-secondary:hover { border-color: var(--zd) !important; background: #f8fafc !important; color: var(--zd) !important; }
+
+  /* Related Card Hover */
+  .rel-card { transition: 0.2s; display: block; text-decoration: none; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; background: #fff; }
+  .rel-card:hover { transform: translateY(-4px); border-color: var(--zp) !important; box-shadow: var(--zshad) !important; }
+
+  /* Description Truncate Logic */
+  .desc-truncate { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Swiper UI Overrides */
+  .swiper-button-next, .swiper-button-prev {
+    color: var(--zd) !important; background: rgba(255,255,255,0.8); width: 40px; height: 40px; border-radius: 50%; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .swiper-button-next:after, .swiper-button-prev:after { font-size: 1.2rem; font-weight: 800; }
+
+  /* Responsive */
+  @media(max-width: 992px) {
+    .map-workspace { flex-direction: column; }
+    .map-sidebar { width: 100% !important; order: 2; flex: none; border-right: none !important; border-top: 1px solid #e2e8f0; max-height: none !important; }
+    .map-viewport { width: 100% !important; order: 1; height: 400px !important; }
+  }
+</style>
+
+<div style="background: #f1f5f9; padding: 2rem 0 5rem; color: #475569; font-family: 'Inter', sans-serif;">
+  <div class="container" style="max-width: 1280px;">
+    
+    <!-- BREADCRUMB -->
+    <div style="margin-bottom: 1.5rem; font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.5rem;">
+      <a href="{% url 'home' %}" class="crumb-link" style="color: #64748b; text-decoration: none; transition: 0.2s;">Home</a> <i class="fa-solid fa-chevron-right" style="font-size:0.7em;"></i>
+      <a href="{% url 'property_list' %}" class="crumb-link" style="color: #64748b; text-decoration: none; transition: 0.2s;">Plans</a> <i class="fa-solid fa-chevron-right" style="font-size:0.7em;"></i>
+      <span style="color: #0f172a; font-weight: 600;">{{ map.code }}</span>
+    </div>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="map-workspace">
+      
+      <!-- LEFT: INFO PANEL -->
+      <aside class="map-sidebar" style="flex: 0 0 400px; width: 400px; padding: 2rem; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; max-height: 800px; overflow-y: auto;">
+        
+        <header style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #f1f5f9;">
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.8rem;">
+            <span style="background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 0.25rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em;">ID: {{ map.code }}</span>
+            <span style="background: #f0fdfa; color: var(--zp); border: 1px solid #ccfbf1; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 0.25rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em;">{{ map.get_category_display }}</span>
+          </div>
+          <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--zd); margin-bottom: 0.25rem; line-height: 1.2; letter-spacing: -0.02em;">{{ map.title }}</h1>
+          
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--zd); margin-top: 0.5rem;">
+            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; display: block;">Estimated Plan Cost</span>
+            TZS {{ map.price|floatformat:0|intcomma }}
+          </div>
+        </header>
+
+        <!-- Specs -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.8rem; border-radius: 6px;">
+            <span style="font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 0.2rem;">Bedrooms</span>
+            <div style="font-size: 1rem; font-weight: 600; color: var(--zd); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-bed" style="font-size: 0.9rem; color: var(--zp);"></i> {{ map.number_of_bedrooms }}</div>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.8rem; border-radius: 6px;">
+            <span style="font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 0.2rem;">Bathrooms</span>
+            <div style="font-size: 1rem; font-weight: 600; color: var(--zd); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-bath" style="font-size: 0.9rem; color: var(--zp);"></i> {{ map.number_of_bathrooms }}</div>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.8rem; border-radius: 6px;">
+            <span style="font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 0.2rem;">Total Area</span>
+            <div style="font-size: 1rem; font-weight: 600; color: var(--zd); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-ruler-combined" style="font-size: 0.9rem; color: var(--zp);"></i> {{ map.square_meters }} m²</div>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.8rem; border-radius: 6px;">
+            <span style="font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 0.2rem;">Levels</span>
+            <div style="font-size: 1rem; font-weight: 600; color: var(--zd); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-layer-group" style="font-size: 0.9rem; color: var(--zp);"></i> {{ map.number_of_floors }}</div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        {% if map.detail %}
+        <div style="margin-bottom: 2rem;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--zd); text-transform: uppercase; margin-bottom: 0.5rem;">Project Brief</div>
+          <div id="mapDescription" class="desc-truncate" style="font-size: 0.95rem; line-height: 1.6; color: #475569;">
+            {{ map.detail|linebreaks }}
+          </div>
+          <button id="toggleDescription" style="color: var(--zp); font-size: 0.85rem; font-weight: 600; background: none; border: none; padding: 0; margin-top: 0.5rem; cursor: pointer;">
+            Read Full Brief <i class="fa-solid fa-chevron-down"></i>
+          </button>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid #f1f5f9;">
+          <a href="https://wa.me/255749422626?text=I%27m%20interested%20in%20plan%20{{ map.code }}%20-%20{{ map.title|urlencode }}" target="_blank" class="btn-action-primary" style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; width: 100%; padding: 1rem; background: var(--zp); color: #fff; border: 1px solid var(--zp); border-radius: 6px; font-weight: 700; text-decoration: none; transition: 0.2s; margin-bottom: 0.8rem;">
+            <i class="fa-brands fa-whatsapp"></i> Order Plan on WhatsApp
+          </a>
+          <a href="mailto:info@zenhouse.co.tz?subject=Inquiry%20{{ map.code }}" class="btn-action-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; width: 100%; padding: 0.8rem; background: #fff; color: var(--zd); border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 600; text-decoration: none; transition: 0.2s; font-size: 0.9rem;">
+            <i class="fa-regular fa-envelope"></i> Email Inquiry
+          </a>
+        </div>
+
+      </aside>
+
+      <!-- RIGHT: VIEWPORT GALLERY -->
+      <main class="map-viewport" style="flex: 1; min-width: 320px; background: #e2e8f0; position: relative; display: flex; flex-direction: column;">
+        <div class="swiper mySwiper" style="width: 100%; height: 600px;">
+          <div class="swiper-wrapper">
+            <!-- Main Image First -->
+            <div class="swiper-slide" style="display: flex; align-items: center; justify-content: center; background: #cbd5e1;">
+              {% if map.image %}
+              <img src="{{ map.image.url }}" alt="{{ map.title }}" style="width: 100%; height: 100%; object-fit: contain; background: #fff;">
+              {% else %}
+              <div class="text-muted">No Preview Available</div>
+              {% endif %}
+            </div>
+            
+            <!-- Additional Details -->
+            {% for detail in details %}
+            <div class="swiper-slide" style="display: flex; align-items: center; justify-content: center; background: #cbd5e1;">
+              <img src="{{ detail.image.url }}" alt="Plan Detail" style="width: 100%; height: 100%; object-fit: contain; background: #fff;">
+            </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </main>
+
+    </div>
+
+    <!-- BOTTOM CONTENT -->
+    <div style="padding-top: 4rem;">
+      
+      <!-- How to Buy Strip -->
+      <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 2rem; margin-bottom: 3rem;">
+        <div class="row align-items-center">
+          <div class="col-md-3 mb-3 mb-md-0">
+            <h4 style="font-size: 1.25rem; font-weight: 700; margin: 0; color: #0f172a;">Purchase Process</h4>
+            <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Simple steps to build.</p>
+          </div>
+          <div class="col-md-3">
+            <div class="d-flex gap-2">
+              <span class="badge bg-light text-dark border rounded-circle" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;">1</span>
+              <div>
+                <strong style="display:block; font-size:0.9rem; color:#0f172a;">Chat & Confirm</strong>
+                <span style="display:block; font-size:0.75rem; color:#64748b;">Verify plot fit via WhatsApp.</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="d-flex gap-2">
+              <span class="badge bg-light text-dark border rounded-circle" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;">2</span>
+              <div>
+                <strong style="display:block; font-size:0.9rem; color:#0f172a;">Secure Payment</strong>
+                <span style="display:block; font-size:0.75rem; color:#64748b;">Bank transfer or mobile money.</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="d-flex gap-2">
+              <span class="badge bg-light text-dark border rounded-circle" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;">3</span>
+              <div>
+                <strong style="display:block; font-size:0.9rem; color:#0f172a;">Receive PDF</strong>
+                <span style="display:block; font-size:0.75rem; color:#64748b;">Instant digital delivery.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Items -->
+      {% if related_maps %}
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--zd); margin: 0;">Similar Projects</h3>
+        <a href="{% url 'property_list' %}?category={{ map.category }}" style="text-decoration: none; font-size: 0.9rem; font-weight: 700; color: var(--zp);">View All Category</a>
+      </div>
+
+      <div class="row g-4">
+        {% for rmap in related_maps %}
+          {% if rmap.id != map.id %}
+          <div class="col-lg-3 col-md-4 col-sm-6">
+            <a href="{% url 'map_detail' rmap.id %}" class="rel-card">
+              {% if rmap.image %}
+              <img src="{{ rmap.image.url }}" style="height: 180px; width: 100%; object-fit: cover; background: #f1f5f9;">
+              {% else %}
+              <div style="height: 180px; width: 100%; background: #f1f5f9;"></div>
+              {% endif %}
+              <div style="padding: 1rem;">
+                <div style="font-size: 1rem; font-weight: 700; color: var(--zd); margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ rmap.title }}</div>
+                <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: 600;">{{ rmap.square_meters }} m² • {{ rmap.number_of_bedrooms }} Bed</div>
+              </div>
+            </a>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    new Swiper(".mySwiper", {
+      loop: true,
+      navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+      pagination: { el: ".swiper-pagination", clickable: true },
+    });
+
+    const toggleBtn = document.getElementById('toggleDescription');
+    const descText = document.getElementById('mapDescription');
+
+    if(toggleBtn && descText) {
+      toggleBtn.addEventListener('click', () => {
+        if(descText.classList.contains('desc-truncate')) {
+          descText.classList.remove('desc-truncate');
+          toggleBtn.innerHTML = 'Show Less <i class="fa-solid fa-chevron-up"></i>';
+        } else {
+          descText.classList.add('desc-truncate');
+          toggleBtn.innerHTML = 'Read Full Brief <i class="fa-solid fa-chevron-down"></i>';
+        }
+      });
+    }
+  });
+</script>
+
+{% endblock %}

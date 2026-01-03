@@ -1,0 +1,317 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if mode == 'edit' %}Edit Property{% else %}New Property{% endif %} | ZenHouse Admin</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+   <!-- ADDED FAVICON HERE -->
+  <link rel="icon" type="image/png" href="{% static 'video/z.jpg' %}">
+
+  <style>
+    /* Theme Tokens */
+    :root {
+      --zp: #0f766e;       /* Primary */
+      --zd: #0f172a;       /* Dark */
+      --zb: #475569;       /* Body */
+      --zbg: #f1f5f9;      /* App BG */
+      --zrad: 8px;
+      --zshad: 0 1px 3px 0 rgba(0,0,0,0.1);
+    }
+
+    /* Base */
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--zbg); color: var(--zb); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Layout Grid */
+    .form-grid { display: grid; grid-template-columns: 1.2fr 1fr; }
+    .col-left { padding: 2.5rem; border-right: 1px solid #e2e8f0; }
+    
+    /* Hover Interactions */
+    .h-close:hover { color: #ef4444 !important; }
+    .h-input:focus { border-color: var(--zp) !important; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1) !important; }
+    .h-btn-remove:hover { background: #fee2e2 !important; }
+    .h-btn-add:hover { background: #f0fdfa !important; border-color: var(--zp) !important; }
+    .h-btn-cancel:hover { background: #f8fafc !important; color: var(--zd) !important; border-color: #94a3b8 !important; }
+    .h-btn-save:hover { background: #1e293b !important; transform: translateY(-1px); }
+
+    /* Responsive */
+    @media(max-width: 992px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .col-left { border-right: none; border-bottom: 1px solid #e2e8f0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- APP HEADER -->
+  <nav style="background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 0.8rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;">
+    <a href="{% url 'home' %}" style="font-weight: 700; color: var(--zd); text-decoration: none; display: flex; align-items: center; gap: 8px;">
+      <span>Dashboard</span>
+    </a>
+    <div>
+      <a href="{% url 'dashboard' %}" class="h-close" title="Close" style="color: #64748b; font-size: 1.2rem; transition: 0.2s;"><i class="fa-solid fa-xmark"></i></a>
+    </div>
+  </nav>
+
+  <!-- FORM WORKSPACE -->
+  <div style="max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1;">
+    
+    <div style="margin-bottom: 2rem;">
+      <div style="font-size: 0.85rem; color: #64748b;">
+        <a href="{% url 'dashboard' %}" style="color: var(--zp); text-decoration: none; font-weight: 500;">Properties</a> / <span>Editor</span>
+      </div>
+      <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--zd); margin: 0; letter-spacing: -0.02em;">
+        {% if mode == 'edit' %}Edit Property{% else %}Add New Property{% endif %}
+      </h1>
+    </div>
+
+    <!-- MESSAGES -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} rounded-3 mb-4 shadow-sm border-0 px-3 py-2 fs-6">
+          <i class="bi bi-info-circle me-2"></i> {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- THE FORM -->
+    <form method="post" enctype="multipart/form-data" action="{% if mode == 'edit' %}{% url 'main_map_edit' object.id %}{% else %}{% url 'main_map_create' %}{% endif %}" 
+          style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: var(--zshad); overflow: hidden;">
+      {% csrf_token %}
+
+      <div class="form-grid">
+        
+        <!-- LEFT: CORE DATA -->
+        <div class="col-left">
+          <div style="font-size: 0.95rem; font-weight: 700; color: var(--zd); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;"><i class="fa-regular fa-id-card me-2"></i> Core Information</div>
+
+          <!-- Basic Fields Loop -->
+          {% for field in form.visible_fields %}
+            {% if field.name != "custom_style" and field.name != "number_of_bedrooms" and field.name != "number_of_bathrooms" and field.name != "number_of_floors" and field.name != "style" %}
+              <div class="mb-3">
+                <label style="font-size: 0.85rem; font-weight: 600; color: var(--zd); margin-bottom: 0.4rem;">{{ field.label }}</label>
+                {% if field.field.widget.input_type == 'select' %}
+                  {{ field|add_class:"form-select h-input"|attr:"style:border-radius:6px; border:1px solid #cbd5e1; padding:0.6rem 0.8rem; font-size:0.95rem;" }}
+                {% else %}
+                  {{ field|add_class:"form-control h-input"|attr:"style:border-radius:6px; border:1px solid #cbd5e1; padding:0.6rem 0.8rem; font-size:0.95rem;" }}
+                {% endif %}
+                {% if field.help_text %}
+                  <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.3rem;">{{ field.help_text }}</div>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+
+          <!-- Style Selectors -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-12">
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--zd); margin-bottom: 0.4rem;">Architectural Style</label>
+              {{ form.style|add_class:"form-select h-input"|attr:"id:id_style"|attr:"style:border-radius:6px; border:1px solid #cbd5e1; padding:0.6rem 0.8rem; font-size:0.95rem;" }}
+            </div>
+            <!-- Custom Style Hidden -->
+            <div class="col-md-12" id="custom-style-field" style="display:none;">
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--zd); margin-bottom: 0.4rem;">Specify Custom Style</label>
+              {{ form.custom_style|add_class:"form-control h-input"|attr:"style:border-radius:6px; border:1px solid #cbd5e1; padding:0.6rem 0.8rem; font-size:0.95rem;" }}
+            </div>
+          </div>
+
+          <!-- Numeric Grid -->
+          <div class="row g-3">
+            <div class="col-sm-4">
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--zd); margin-bottom: 0.4rem;">Bedrooms</label>
+              {{ form.number_of_bedrooms|add_class:"form-control h-input"|attr:"type:number"|attr:"style:border-radius:6px; border:1px solid #cbd5e1; padding:0.6rem 0.8rem; font-size:0.95rem;" }}
+            </div>
+            <div class="col-sm-4">
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--zd); margin-bottom: 0.4rem;">Bathrooms</label>
+              {{ form.number_of_bathrooms|add_class:"form-control h-input"|attr:"type:number"|attr:"style:border-radius:6px; border:1px solid #cbd5e1; padding:0.6rem 0.8rem; font-size:0.95rem;" }}
+            </div>
+            <div class="col-sm-4">
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--zd); margin-bottom: 0.4rem;">Floors</label>
+              {{ form.number_of_floors|add_class:"form-control h-input"|attr:"type:number"|attr:"style:border-radius:6px; border:1px solid #cbd5e1; padding:0.6rem 0.8rem; font-size:0.95rem;" }}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: GALLERY & DETAILS -->
+        <div style="padding: 2.5rem; background: #fcfcfc;">
+          <div style="font-size: 0.95rem; font-weight: 700; color: var(--zd); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;"><i class="fa-regular fa-images me-2"></i> Gallery & Details</div>
+          
+          {{ formset.management_form }}
+          <div id="details-formset">
+            {% for f in formset %}
+              <div class="detail-item" data-existing="{{ f.instance.pk|yesno:'1,0' }}" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; margin-bottom: 1rem; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                  <span style="font-size: 0.75rem; font-weight: 700; color: var(--zp); text-transform: uppercase;">Item #{{ forloop.counter }}</span>
+                  <button type="button" class="h-btn-remove btn-remove-detail" style="font-size: 0.75rem; color: #ef4444; background: #fef2f2; border: 1px solid #fecaca; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer;">Remove</button>
+                </div>
+                
+                <div class="row g-2 mb-2">
+                  <div class="col-12">
+                    {{ f.title|add_class:"form-control form-control-sm h-input"|attr:"placeholder:Title (e.g. Floor Plan)" }}
+                  </div>
+                  <div class="col-12">
+                    {{ f.image|add_class:"form-control form-control-sm h-input" }}
+                  </div>
+                </div>
+                <div>
+                  {{ f.detail|add_class:"form-control form-control-sm h-input"|attr:"rows:2"|attr:"placeholder:Brief description..." }}
+                </div>
+
+                <!-- Hidden Logic -->
+                {% if formset.can_delete %}
+                  <div class="d-none">{{ f.DELETE }}</div>
+                {% endif %}
+                {% for hidden in f.hidden_fields %}
+                  {{ hidden }}
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Add Button -->
+          <button type="button" id="add-form" class="h-btn-add" style="width: 100%; border: 1px dashed #cbd5e1; background: #fff; color: var(--zp); padding: 0.8rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 0.5rem;">
+            <i class="fa-solid fa-plus"></i> Add Gallery Item
+          </button>
+
+          <!-- Empty Template (Hidden) -->
+          <template id="detail-empty-template">
+            <div class="detail-item" data-existing="0" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; margin-bottom: 1rem; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--zp); text-transform: uppercase;">New Item</span>
+                <button type="button" class="h-btn-remove btn-remove-detail" style="font-size: 0.75rem; color: #ef4444; background: #fef2f2; border: 1px solid #fecaca; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer;">Remove</button>
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-12">
+                  {{ formset.empty_form.title|add_class:"form-control form-control-sm h-input"|attr:"placeholder:Title" }}
+                </div>
+                <div class="col-12">
+                  {{ formset.empty_form.image|add_class:"form-control form-control-sm h-input" }}
+                </div>
+              </div>
+              <div>
+                {{ formset.empty_form.detail|add_class:"form-control form-control-sm h-input"|attr:"rows:2"|attr:"placeholder:Description..." }}
+              </div>
+            </div>
+          </template>
+
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div style="border-top: 1px solid #e2e8f0; padding: 1.5rem 2.5rem; background: #fff; display: flex; justify-content: flex-end; gap: 12px;">
+        <a href="{% url 'dashboard' %}" class="h-btn-cancel" style="background: #fff; border: 1px solid #cbd5e1; color: var(--zb); padding: 0.7rem 1.5rem; border-radius: 6px; font-weight: 600; text-decoration: none; transition: 0.2s; font-size: 0.9rem;">Cancel</a>
+        <button type="submit" class="h-btn-save" style="background: var(--zd); color: #fff; border: none; padding: 0.7rem 2rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          <i class="fa-solid fa-cloud-arrow-up me-2"></i> Save Property
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      // 1. FORMSET LOGIC
+      const container = document.getElementById('details-formset');
+      const addBtn = document.getElementById('add-form');
+      const totalForms = document.getElementById('id_details-TOTAL_FORMS');
+      const template = document.getElementById('detail-empty-template');
+
+      if(addBtn && container && totalForms && template){
+        addBtn.addEventListener('click', () => {
+          const idx = parseInt(totalForms.value);
+          const html = template.innerHTML.replace(/__prefix__/g, idx);
+          const div = document.createElement('div');
+          div.innerHTML = html;
+          container.appendChild(div.firstElementChild);
+          totalForms.value = idx + 1;
+        });
+
+        container.addEventListener('click', (e) => {
+          if(e.target.classList.contains('btn-remove-detail')) {
+            const block = e.target.closest('.detail-item');
+            const isExisting = block.dataset.existing === '1';
+            const delBox = block.querySelector('input[name$="-DELETE"]');
+            
+            if(isExisting && delBox) {
+              delBox.checked = true;
+              block.style.display = 'none';
+            } else {
+              block.remove();
+            }
+          }
+        });
+      }
+
+      // 2. STYLE TOGGLE
+      const styleSelect = document.getElementById("id_style");
+      const customDiv = document.getElementById("custom-style-field");
+      
+      function checkStyle() {
+        if(styleSelect && customDiv) {
+          customDiv.style.display = (styleSelect.value === "other") ? "block" : "none";
+        }
+      }
+      if(styleSelect) {
+        styleSelect.addEventListener("change", checkStyle);
+        checkStyle();
+      }
+
+      // 3. FILE SIZE CHECK
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function(e){
+        let total = 0;
+        document.querySelectorAll('input[type="file"]').forEach(i => {
+          if(i.files[0]) total += i.files[0].size;
+        });
+        if(total > 25 * 1024 * 1024) { // 25MB
+          e.preventDefault();
+          alert("Total file size exceeds 25MB. Please upload smaller images.");
+        }
+      });
+    });
+  </script>
+
+  <!-- ==============================================
+       SECURITY SCRIPTS
+       ============================================== -->
+  <script>
+    // 1. Disable Right Click
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // 2. Disable Keyboard Shortcuts (Ctrl+U, F12, Save, Print)
+    document.onkeydown = function (e) {
+      if (e.keyCode == 123) return false; // F12
+      if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) return false; // DevTools
+      if (e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U
+      if (e.ctrlKey && e.keyCode == 83) return false; // Ctrl+S
+      if (e.ctrlKey && e.keyCode == 80) return false; // Ctrl+P
+    };
+
+    // 3. DevTools Detection & Debugger Trap
+    (function() {
+      const block = function() {
+          const start = new Date().getTime();
+          debugger; // Execution pauses here if DevTools is open
+          const end = new Date().getTime();
+      };
+      // Run check every 500ms
+      setInterval(block, 500);
+    })();
+  </script>
+</body>
+</html>

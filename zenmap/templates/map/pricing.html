@@ -1,0 +1,454 @@
+{% extends "map/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}ZenHouse – Pricing{% endblock %}
+
+{% block content %}
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Essential Interactive CSS (Cannot be inline) -->
+<style>
+  :root {
+    --zp: #0f766e;
+    --zph: #115e59;
+    --za: #2dd4bf;
+    --zd: #0f172a;
+    --zb: #475569;
+    --zs: #f8fafc;
+    --zrad: 12px;
+    --zshad: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --zshad-h: 0 20px 25px -5px rgba(0,0,0,0.1);
+  }
+
+  /* Hover & Focus States */
+  .h-card-lift { transition: 0.3s; border-top: 4px solid transparent; }
+  .h-card-lift:hover { transform: translateY(-8px); box-shadow: var(--zshad-h); border-top-color: var(--zp); }
+  .h-card-lift:hover img { transform: scale(1.05); }
+  
+  .h-btn-outline:hover { background: var(--zd) !important; color: #fff !important; border-color: var(--zd) !important; }
+  .h-btn-primary:hover { background: var(--zph) !important; transform: translateY(-2px); box-shadow: 0 10px 15px rgba(15,118,110,0.3); color: #fff !important; }
+  
+  .h-option:hover { border-color: #cbd5e1 !important; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+  .h-option.selected { background: #f0fdfa !important; border-color: var(--zp) !important; box-shadow: 0 0 0 1px var(--zp) !important; }
+  .h-option.selected .option-check { background: var(--zp); border-color: var(--zp); box-shadow: inset 0 0 0 3px #fff; }
+
+  /* Wizard Animations */
+  .wizard-step { display: none; animation: fadeIn 0.4s ease; }
+  .wizard-step.active { display: block; }
+  .wizard-result { display: none; animation: fadeIn 0.5s ease; }
+  .wizard-result.visible { display: flex !important; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Step Pills Active State */
+  .step-pill.active { background: var(--zd) !important; color: #fff !important; }
+  .step-pill.active span { background: var(--za) !important; box-shadow: 0 0 5px var(--za); }
+
+  /* FAQ Details */
+  .faq-item[open] .faq-icon { transform: rotate(180deg); color: var(--zp) !important; }
+  summary::-webkit-details-marker { display: none; }
+
+  /* Responsive Text */
+  .pricing-price { font-size: clamp(1.25rem, 5vw, 1.8rem); }
+
+  /* Pseudo-element Overlay */
+  .pricing-img-overlay::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+  }
+
+  @media(max-width: 992px) {
+    .faq-grid { grid-template-columns: 1fr !important; }
+    .wiz-res-responsive { flex-direction: column; text-align: center; }
+  }
+</style>
+
+<!-- HERO -->
+<section style="padding: 100px 0 80px; position: relative; border-bottom: 1px solid #f1f5f9; background: linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, rgba(248,250,252,0.95) 100%), url('{% static 'video/lx2.jpg' %}'); background-size: cover; background-position: center; font-family: 'Inter', sans-serif; text-align: center;">
+  <div class="container px-4">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.85rem; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); color: var(--zp); border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1.5rem;">
+      <i class="fa-solid fa-check-circle"></i> Transparent Pricing
+    </div>
+    <h1 style="font-size: 3rem; font-weight: 800; color: var(--zd); margin-bottom: 1rem; letter-spacing: -0.03em; text-shadow: 0 2px 20px rgba(255,255,255,0.8);">Simple plans for every stage</h1>
+    <p style="font-size: 1.25rem; color: var(--zd); max-width: 680px; margin: 0 auto; font-weight: 500;">
+      Whether you need a quick concept for estimation or a full architectural set for construction, choose the tier that fits your journey.
+    </p>
+  </div>
+</section>
+
+<!-- PRICING TABLE -->
+<section style="padding-bottom: 3rem; margin-top: -3rem; font-family: 'Inter', sans-serif;">
+  <div class="container px-4" style="margin-top: -30px;">
+    <div class="row g-4 justify-content-center">
+      
+      {% for plan in plans %}
+      <div class="col-lg-4 col-md-6">
+        <div style="height: 100%; padding-top: 1.5rem;">
+          <div class="h-card-lift" style="background: #fff; border-radius: 12px; padding: 0; box-shadow: var(--zshad); position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; {% if plan.highlight %}border-top-color: var(--zp); box-shadow: 0 20px 40px -10px rgba(15,118,110,0.15); z-index: 2;{% endif %}">
+            
+            {% if plan.badge %}
+            <span style="position: absolute; top: 1.5rem; right: 1.5rem; background: var(--za); color: #0f3f3a; padding: 0.25rem 0.6rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; border-radius: 4px; z-index: 10;">{{ plan.badge }}</span>
+            {% endif %}
+            
+            <!-- Header -->
+            <div style="padding: 2rem 2rem 1rem 2rem; text-align: left;">
+              <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--zb); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">{{ plan.name }}</h3>
+              <div class="pricing-price" style="font-weight: 800; color: var(--zd); margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 1.2;">{{ plan.price }}</div>
+            </div>
+
+            <!-- Image -->
+            {% cycle 'video/bg.webp' 'video/lx1.jpg' 'video/lx.jpg' as plan_img_path silent %}
+            <div class="pricing-img-overlay" style="margin: 0.5rem 1.5rem 1.5rem 1.5rem; height: 160px; border-radius: 8px; overflow: hidden; position: relative;">
+              <img src="{% static plan_img_path %}" alt="Plan Visualization" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;">
+            </div>
+
+            <!-- Body -->
+            <div style="padding: 0 2rem 2.5rem 2rem; display: flex; flex-direction: column; flex-grow: 1;">
+              <p style="font-size: 0.95rem; color: var(--zb); margin-bottom: 1.5rem; line-height: 1.5; flex-grow: 1;">{{ plan.description }}</p>
+
+              <a href="{% url 'property_list' %}?tier={{ plan.slug }}" 
+                 class="{% if plan.highlight %}h-btn-primary{% else %}h-btn-outline{% endif %}"
+                 style="width: 100%; padding: 0.8rem; border-radius: 6px; font-weight: 700; transition: all 0.2s; text-align: center; font-size: 0.95rem; text-decoration: none; display: inline-block; {% if plan.highlight %}background: var(--zp); color: #fff; border: 1px solid var(--zp); box-shadow: 0 4px 6px rgba(15,118,110,0.2);{% else %}border: 1px solid #cbd5e1; color: var(--zd); background: #fff;{% endif %}">
+                 Browse {{ plan.name }} Plans
+              </a>
+
+              <ul style="margin: 1.5rem 0 0 0; padding: 1.5rem 0 0 0; list-style: none; border-top: 1px solid #f1f5f9;">
+                {% for item in plan.features %}
+                <li style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem; font-size: 0.9rem; color: #334155; font-weight: 500;">
+                  <span style="color: var(--zp); font-size: 0.9rem; line-height: 1.5; flex-shrink: 0;"><i class="fa-solid fa-check"></i></span>
+                  <span>{{ item }}</span>
+                </li>
+                {% endfor %}
+              </ul>
+              
+              <div style="font-size: 0.85rem; text-align: center; color: #94a3b8; margin-top: 1.25rem;">
+                Need custom work? <a href="{% url 'contact' %}" style="color: var(--zp); text-decoration: none; font-weight: 600;">Contact us</a>.
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+
+<!-- WIZARD -->
+<section style="padding: 100px 0; background: #f8fafc; border-top: 1px solid #e2e8f0; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+    <div id="plan-finder" data-property-url="{% url 'property_list' %}" style="background: #fff; border-radius: 12px; box-shadow: var(--zshad); padding: 0; max-width: 900px; margin: 0 auto; overflow: hidden; border: 1px solid #e2e8f0;">
+      
+      <!-- Wizard Header -->
+      <div style="background: #fff; padding: 2.5rem 2rem 1rem; text-align: center; border-bottom: 1px solid #f1f5f9;">
+        <h2 class="h3 fw-bold mb-1" style="color: var(--zd);">Plan Finder</h2>
+        <p class="text-muted small">Answer 4 questions to get a recommendation.</p>
+        
+        <div style="display: flex; gap: 0.75rem; margin-top: 2rem; flex-wrap: wrap; justify-content: center;">
+          <div class="step-pill active" data-step-pill="1" style="padding: 0.4rem 1rem; border-radius: 6px; background: #f1f5f9; color: #94a3b8; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; cursor: default;"><span style="width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%;"></span> Budget</div>
+          <div class="step-pill" data-step-pill="2" style="padding: 0.4rem 1rem; border-radius: 6px; background: #f1f5f9; color: #94a3b8; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; cursor: default;"><span style="width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%;"></span> Bedrooms</div>
+          <div class="step-pill" data-step-pill="3" style="padding: 0.4rem 1rem; border-radius: 6px; background: #f1f5f9; color: #94a3b8; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; cursor: default;"><span style="width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%;"></span> Floors</div>
+          <div class="step-pill" data-step-pill="4" style="padding: 0.4rem 1rem; border-radius: 6px; background: #f1f5f9; color: #94a3b8; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; cursor: default;"><span style="width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%;"></span> Style</div>
+        </div>
+      </div>
+
+      <div style="padding: 2.5rem 3rem;">
+        <!-- STEP 1 -->
+        <div class="wizard-step active" data-step="1">
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--zd); margin-bottom: 0.5rem; letter-spacing: -0.02em;">1. What is your estimated budget?</div>
+          <div style="color: #64748b; margin-bottom: 2rem; font-size: 1rem;">We'll match you with plans that are cost-effective to build.</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+            <label class="h-option" data-group="budget" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="budget" value="basic" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">Economy (Under 30M TZS)</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">Simple shapes, standard materials, easy to build.</span>
+            </label>
+            <label class="h-option" data-group="budget" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="budget" value="standard" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">Standard (30M - 80M TZS)</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">Balanced finishings, modern look, good size.</span>
+            </label>
+            <label class="h-option" data-group="budget" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="budget" value="premium" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">Luxury (80M+ TZS)</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">Complex structures, high-end finishings, unique features.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="wizard-step" data-step="2">
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--zd); margin-bottom: 0.5rem; letter-spacing: -0.02em;">2. How many bedrooms do you need?</div>
+          <div style="color: #64748b; margin-bottom: 2rem; font-size: 1rem;">Space planning is key to pricing.</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+            <label class="h-option" data-group="bedrooms" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="bedrooms" value="1-2" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">1 – 2 Bedrooms</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">Guest wing, starter home, or rental unit.</span>
+            </label>
+            <label class="h-option" data-group="bedrooms" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="bedrooms" value="3-4" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">3 – 4 Bedrooms</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">Standard family home size.</span>
+            </label>
+            <label class="h-option" data-group="bedrooms" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="bedrooms" value="5+" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">5+ Bedrooms</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">Large family residence or villa.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="wizard-step" data-step="3">
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--zd); margin-bottom: 0.5rem; letter-spacing: -0.02em;">3. Single or Multi-storey?</div>
+          <div style="color: #64748b; margin-bottom: 2rem; font-size: 1rem;">Going up usually increases structural design costs.</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+            <label class="h-option" data-group="floors" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="floors" value="1" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">Ground Floor Only</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">Bungalows. Easier and cheaper to construct.</span>
+            </label>
+            <label class="h-option" data-group="floors" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="floors" value="2+" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">Double Storey +</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">Maximizes plot usage. Requires structural engineering.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="wizard-step" data-step="4">
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--zd); margin-bottom: 0.5rem; letter-spacing: -0.02em;">4. What matters most to you?</div>
+          <div style="color: #64748b; margin-bottom: 2rem; font-size: 1rem;">This helps us pick the final tier.</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+            <label class="h-option" data-group="preference" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="preference" value="basic" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">Function &amp; Cost</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">I want a practical roof over my head. No fancy extras.</span>
+            </label>
+            <label class="h-option" data-group="preference" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="preference" value="standard" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">Aesthetics &amp; Value</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">I want it to look modern and beautiful, but affordable.</span>
+            </label>
+            <label class="h-option" data-group="preference" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; cursor: pointer; transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; height: 100%;">
+              <input type="radio" name="preference" value="premium" hidden>
+              <span class="option-check" style="position: absolute; top: 1.5rem; right: 1.5rem; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; transition: 0.2s;"></span>
+              <span style="font-weight: 700; font-size: 1.05rem; color: var(--zd); display: block; margin-bottom: 0.5rem;">Uniqueness &amp; Detail</span>
+              <span style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">I want a standout landmark home tailored to me.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+          <button type="button" id="planPrevBtn" disabled style="color: #94a3b8; font-weight: 600; background: none; border: none; padding: 0.5rem 1rem; font-size: 0.95rem; cursor:pointer;">Back</button>
+          <button type="button" id="planNextBtn" style="background: var(--zd); color: #fff; padding: 0.8rem 2rem; border-radius: 6px; font-weight: 600; border: none; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor:pointer;">Next Step</button>
+        </div>
+
+        <!-- Result -->
+        <div class="wizard-result wiz-res-responsive" id="planResult" style="background: #f0fdfa; border: 1px solid var(--zp); border-radius: 8px; padding: 2rem; align-items: center; justify-content: space-between; gap: 1.5rem;">
+          <div>
+            <div id="planResultTitleDiv" style="font-weight: 700; font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--zd);">
+              <span style="background: var(--zp); color: #fff; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; font-weight: 700; margin-right: 8px; vertical-align: middle;">Recommended</span>
+              <span id="planResultTitle">Standard Plan</span>
+            </div>
+            <div id="planResultText" style="color: #64748b;">Based on your choices, this tier offers the best value.</div>
+          </div>
+          <a href="#" id="planResultLink" class="h-btn-primary" style="background: var(--zp); color: #fff; border: 1px solid var(--zp); box-shadow: 0 4px 6px rgba(15, 118, 110, 0.2); padding: 0.8rem 2rem; border-radius: 6px; font-weight: 700; text-decoration: none; text-align: center; white-space: nowrap;">View Plans</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FAQ + SUPPORT -->
+<section style="padding: 80px 0; background: #fff; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+    <div class="faq-grid" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 4rem;">
+      
+      <!-- FAQ Left -->
+      <div>
+        <h2 class="h3 fw-bold mb-4" style="color:var(--zd);">Frequently Asked Questions</h2>
+        
+        <details class="faq-item" open style="background: #fff; border-bottom: 1px solid #e2e8f0; margin-bottom: 0; transition: 0.3s; border-top: 1px solid #e2e8f0;">
+          <summary style="padding: 1.5rem 0; cursor: pointer; font-weight: 600; font-size: 1.05rem; color: var(--zd); display: flex; justify-content: space-between; align-items: center; list-style: none;">
+            Are these prices final? <i class="fa-solid fa-chevron-down faq-icon" style="transition: 0.3s; color: #cbd5e1;"></i>
+          </summary>
+          <div style="padding: 0 0 1.5rem; color: var(--zb); font-size: 1rem; line-height: 1.7;">
+            The prices listed are for the architectural drawing packages. Structural Engineering drawings or specialized BOQs are add-on services quoted separately.
+          </div>
+        </details>
+
+        <details class="faq-item" style="background: #fff; border-bottom: 1px solid #e2e8f0; margin-bottom: 0; transition: 0.3s;">
+          <summary style="padding: 1.5rem 0; cursor: pointer; font-weight: 600; font-size: 1.05rem; color: var(--zd); display: flex; justify-content: space-between; align-items: center; list-style: none;">
+            Can I customize a plan I buy? <i class="fa-solid fa-chevron-down faq-icon" style="transition: 0.3s; color: #cbd5e1;"></i>
+          </summary>
+          <div style="padding: 0 0 1.5rem; color: var(--zb); font-size: 1rem; line-height: 1.7;">
+            Absolutely. Minor changes are often free. Major structural changes or room additions attract a customization fee.
+          </div>
+        </details>
+
+        <details class="faq-item" style="background: #fff; border-bottom: 1px solid #e2e8f0; margin-bottom: 0; transition: 0.3s;">
+          <summary style="padding: 1.5rem 0; cursor: pointer; font-weight: 600; font-size: 1.05rem; color: var(--zd); display: flex; justify-content: space-between; align-items: center; list-style: none;">
+            How do I pay? <i class="fa-solid fa-chevron-down faq-icon" style="transition: 0.3s; color: #cbd5e1;"></i>
+          </summary>
+          <div style="padding: 0 0 1.5rem; color: var(--zb); font-size: 1rem; line-height: 1.7;">
+            We accept Mobile Money (M-Pesa, Tigo Pesa, Airtel Money) and Bank Transfers. You typically pay a deposit to start customization.
+          </div>
+        </details>
+
+        <details class="faq-item" style="background: #fff; border-bottom: 1px solid #e2e8f0; margin-bottom: 0; transition: 0.3s;">
+          <summary style="padding: 1.5rem 0; cursor: pointer; font-weight: 600; font-size: 1.05rem; color: var(--zd); display: flex; justify-content: space-between; align-items: center; list-style: none;">
+            What file formats do I get? <i class="fa-solid fa-chevron-down faq-icon" style="transition: 0.3s; color: #cbd5e1;"></i>
+          </summary>
+          <div style="padding: 0 0 1.5rem; color: var(--zb); font-size: 1rem; line-height: 1.7;">
+            You will receive high-resolution PDF files ready for printing. CAD (DWG) files are available on Premium tiers.
+          </div>
+        </details>
+      </div>
+
+      <!-- Support Right -->
+      <div>
+        <div class="h-card-lift" style="background: linear-gradient(to bottom, rgba(15,23,42,0.9), rgba(15,23,42,0.95)), url('{% static 'video/bg.webp' %}'); background-size: cover; background-position: center; border-radius: 12px; padding: 2.5rem; color: #fff; box-shadow: var(--zshad-h); position: sticky; top: 100px;">
+          <h3 class="h5 fw-bold mb-3">Still have questions?</h3>
+          <p class="small text-white-50 mb-4">
+            Building a home is a big investment. Talk to our lead architect to clarify your doubts.
+          </p>
+          <ul class="list-unstyled small mb-4">
+            <li class="mb-2"><i class="fa-solid fa-check me-2 text-info"></i> Free initial consultation</li>
+            <li class="mb-2"><i class="fa-solid fa-check me-2 text-info"></i> Site analysis advice</li>
+            <li class="mb-2"><i class="fa-solid fa-check me-2 text-info"></i> Material cost estimates</li>
+          </ul>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <a href="https://wa.me/255749422626" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #fff; color: var(--zd); padding: 0.8rem 1.5rem; border-radius: 6px; font-size: 0.95rem; font-weight: 700; transition: 0.2s; text-decoration: none; border: 1px solid transparent;">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp
+            </a>
+            <a href="{% url 'contact' %}" class="h-btn-outline" style="display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 0.8rem 1.5rem; border-radius: 6px; font-size: 0.95rem; font-weight: 700; transition: 0.2s; text-decoration: none;">
+              <i class="fa-regular fa-envelope"></i> Email Us
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const finder = document.querySelector('#plan-finder');
+    if (!finder) return;
+
+    const baseUrl = finder.dataset.propertyUrl || '';
+    const steps = Array.from(finder.querySelectorAll('.wizard-step'));
+    const pills = Array.from(finder.querySelectorAll('.step-pill'));
+    const options = Array.from(finder.querySelectorAll('.h-option'));
+
+    const prevBtn = document.getElementById('planPrevBtn');
+    const nextBtn = document.getElementById('planNextBtn');
+    const resultBox = document.getElementById('planResult');
+    const resultTitle = document.getElementById('planResultTitle');
+    const resultText = document.getElementById('planResultText');
+    const resultLink = document.getElementById('planResultLink');
+    const controls = document.querySelector('.wizard-controls'); // Note: added class in inline section manually or via querySelector relative logic
+
+    const answers = {
+      budget: null,
+      bedrooms: null,
+      floors: null,
+      preference: null,
+    };
+
+    let currentStep = 1;
+
+    function updateUI(step) {
+      currentStep = step;
+      steps.forEach(s => s.classList.remove('active'));
+      const activeStepEl = steps.find(s => parseInt(s.dataset.step) === step);
+      if(activeStepEl) activeStepEl.classList.add('active');
+
+      pills.forEach(p => {
+        const pNum = parseInt(p.dataset.stepPill);
+        p.classList.toggle('active', pNum === step);
+      });
+
+      prevBtn.disabled = (step === 1);
+      prevBtn.style.opacity = (step === 1) ? "0.5" : "1";
+      nextBtn.textContent = (step === steps.length) ? "Show Recommendation" : "Next Step";
+    }
+
+    function selectOption(card) {
+      const group = card.dataset.group;
+      const input = card.querySelector('input');
+      const val = input.value;
+      answers[group] = val;
+
+      options.filter(o => o.dataset.group === group).forEach(o => o.classList.remove('selected'));
+      card.classList.add('selected');
+      input.checked = true;
+    }
+
+    options.forEach(card => card.addEventListener('click', () => selectOption(card)));
+
+    function validateStep(step) {
+      if (step === 1) return !!answers.budget;
+      if (step === 2) return !!answers.bedrooms;
+      if (step === 3) return !!answers.floors;
+      if (step === 4) return !!answers.preference;
+      return true;
+    }
+
+    function calculateResult() {
+      let tier = answers.budget || 'standard';
+      if (answers.preference === 'premium') tier = 'premium';
+      if (answers.preference === 'basic' && tier === 'standard') tier = 'basic';
+      if ((answers.bedrooms === '5+' || answers.floors === '2+') && tier === 'basic') tier = 'standard';
+
+      let title = "Standard Plan", desc = "Balanced package for most family homes.";
+      if (tier === 'basic') { title = "Basic Plan"; desc = "Cost-effective, functional designs perfect for getting started."; }
+      else if (tier === 'premium') { title = "Premium Plan"; desc = "Signature designs with high-end detailing."; }
+
+      resultTitle.textContent = title;
+      resultText.textContent = desc;
+      resultLink.href = `${baseUrl}?tier=${tier}`;
+      
+      // Controls usually found via DOM traversal if class isn't perfect
+      if(nextBtn.parentElement) nextBtn.parentElement.style.display = 'none';
+      resultBox.classList.add('visible');
+    }
+
+    prevBtn.addEventListener('click', () => { if (currentStep > 1) updateUI(currentStep - 1); });
+
+    nextBtn.addEventListener('click', () => {
+      if (!validateStep(currentStep)) {
+        alert("Please select an option to continue.");
+        return;
+      }
+      if (currentStep < steps.length) updateUI(currentStep + 1);
+      else calculateResult();
+    });
+
+    updateUI(1);
+  });
+</script>
+{% endblock %}

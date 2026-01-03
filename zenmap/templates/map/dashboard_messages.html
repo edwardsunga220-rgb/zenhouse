@@ -1,0 +1,503 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Messages | ZenHouse Admin</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+   <!-- ADDED FAVICON HERE -->
+  <link rel="icon" type="image/png" href="{% static 'video/z.jpg' %}">
+
+  <style>
+    /* --- THEME TOKENS --- */
+    :root {
+      --zp: #0f766e;       /* Deep Teal */
+      --zd: #0f172a;       /* Dark Slate */
+      --zb: #475569;       /* Body Grey */
+      --zbg: #f1f5f9;      /* Background */
+      --zrad: 8px;
+      --zshad: 0 1px 3px 0 rgba(0,0,0,0.1);
+      --zshad-h: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+
+    body { font-family: 'Inter', sans-serif; background-color: var(--zbg); color: var(--zb); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Header */
+    .dash-nav { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0.8rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+    .dash-brand { font-weight: 700; color: var(--zd); text-decoration: none; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; }
+    
+    /* Workspace */
+    .msg-container { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; width: 100%; flex: 1; padding-bottom: 4rem; }
+    
+    /* Tabs */
+    .nav-pills .nav-link { color: var(--zb); font-weight: 600; padding: 0.6rem 1.2rem; border-radius: 6px; margin-right: 0.5rem; transition: 0.2s; border: 1px solid transparent; }
+    .nav-pills .nav-link:hover:not(.active) { background-color: #e2e8f0; }
+    .nav-pills .nav-link.active { background-color: var(--zd); color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    
+    /* Message Card */
+    .msg-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; transition: 0.2s; display: flex; flex-direction: column; gap: 10px; }
+    .msg-card:hover { transform: translateY(-2px); box-shadow: var(--zshad-h); border-color: #cbd5e1; }
+    .msg-card.read { background: #f8fafc; opacity: 0.9; }
+
+    /* Content */
+    .msg-sender { font-weight: 700; color: var(--zd); font-size: 1rem; }
+    .msg-badge { background: #f0fdfa; color: var(--zp); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; text-transform: uppercase; font-weight: 700; border: 1px solid #ccfbf1; }
+    .msg-meta { font-size: 0.8rem; color: #94a3b8; display: flex; align-items: center; gap: 8px; }
+    
+    .msg-subject { font-weight: 600; color: var(--zd); margin-top: 0.2rem; font-size: 0.95rem; }
+    .msg-preview { color: var(--zb); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%; }
+
+    /* Actions */
+    .msg-actions { margin-top: 1rem; border-top: 1px solid #f1f5f9; padding-top: 1rem; display: flex; justify-content: flex-end; gap: 10px; }
+    
+    .btn-view { background: #fff; border: 1px solid #cbd5e1; color: var(--zd); padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-view:hover { background: #f1f5f9; border-color: var(--zd); }
+    
+    .btn-check { background: var(--zp); border: none; color: #fff; padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+    .btn-check:hover { background: #115e59; color: #fff; transform: translateY(-1px); }
+
+    .btn-del { color: #dc2626; border: 1px solid #fecaca; background: #fff; padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-del:hover { background: #fef2f2; color: #b91c1c; }
+
+    /* Empty State */
+    .empty-box { text-align: center; padding: 4rem 2rem; border: 2px dashed #e2e8f0; border-radius: 8px; color: #94a3b8; }
+
+    /* Pagination */
+    .zen-pagination { display: flex; justify-content: center; margin-top: 2rem; }
+    .page-link { color: var(--zd); border: 1px solid #e2e8f0; margin: 0 3px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; }
+    .page-link:hover { color: var(--zp); background: #f8fafc; }
+    .page-item.active .page-link { background-color: var(--zd); border-color: var(--zd); color: #fff; }
+    .page-item.disabled .page-link { color: #cbd5e1; background: #fff; border-color: #f1f5f9; pointer-events: none; }
+
+    /* Responsive */
+    @media(max-width: 768px) {
+      .msg-header { flex-direction: column; gap: 5px; }
+      .msg-actions { justify-content: stretch; }
+      .msg-actions a, .msg-actions button { flex: 1; text-align: center; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="dash-nav">
+    <a href="{% url 'home' %}" class="dash-brand">
+      <span>ZenHouse Admin</span>
+    </a>
+    <a href="{% url 'dashboard' %}" style="color: #64748b; font-size: 1.2rem; transition: 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#64748b'">
+      <i class="fa-solid fa-xmark"></i>
+    </a>
+  </nav>
+
+  <div class="msg-container">
+    
+    <!-- Header -->
+    <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
+      <div>
+        <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--zd); margin: 0; letter-spacing: -0.02em;">Message Center</h1>
+        <p style="color: #64748b; margin: 0.2rem 0 0; font-size: 0.95rem;">Review and reply to inquiries.</p>
+      </div>
+    </div>
+
+    <!-- Django Messages (Alerts) -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} rounded-3 shadow-sm border-0 px-3 py-2 fs-6 mb-4">
+          <i class="fa-solid fa-info-circle me-2"></i> {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Tabs Header -->
+    <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-inbox-tab" data-bs-toggle="pill" data-bs-target="#pills-inbox" type="button" role="tab">
+          <i class="fa-solid fa-inbox me-2"></i> Inbox 
+          {% if new_count > 0 %}<span class="badge bg-white text-dark ms-2 shadow-sm">{{ new_count }}</span>{% endif %}
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-archive-tab" data-bs-toggle="pill" data-bs-target="#pills-archive" type="button" role="tab">
+          <i class="fa-solid fa-check-double me-2"></i> Processed
+        </button>
+      </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="pills-tabContent">
+      
+      <!-- ==================== INBOX TAB ==================== -->
+      <div class="tab-pane fade show active" id="pills-inbox" role="tabpanel">
+        
+        {% for msg in inbox_messages %}
+          <div class="msg-card">
+            <!-- Header Row -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;" class="msg-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="msg-sender">{{ msg.name }}</span>
+                <span class="msg-badge">{{ msg.page|default:"General" }}</span>
+              </div>
+              <div class="msg-meta">
+                <i class="fa-regular fa-clock"></i> {{ msg.created_at|naturaltime }}
+              </div>
+            </div>
+            
+            <!-- Body -->
+            <div>
+              <div class="msg-subject">{{ msg.subject }}</div>
+              <div class="msg-preview">{{ msg.message }}</div>
+            </div>
+
+            <!-- Actions -->
+            <div class="msg-actions">
+              <button type="button" class="btn-view" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#readModal"
+                      data-id="{{ msg.id }}"
+                      data-name="{{ msg.name }}"
+                      data-email="{{ msg.email }}"
+                      data-subject="{{ msg.subject }}"
+                      data-message="{{ msg.message }}"
+                      data-date="{{ msg.created_at|date:'M d, Y H:i' }}">
+                Read & Reply
+              </button>
+              <a href="{% url 'mark_message_processed' msg.id %}" class="btn-check">
+                <i class="fa-solid fa-check"></i> Mark Done
+              </a>
+            </div>
+          </div>
+        {% empty %}
+          <div class="empty-box">
+            <i class="fa-regular fa-envelope-open fa-3x mb-3 text-secondary opacity-50"></i>
+            <h5>All caught up!</h5>
+            <p>You have no new messages in your inbox.</p>
+          </div>
+        {% endfor %}
+
+        <!-- INBOX PAGINATION -->
+        {% if inbox_messages.has_other_pages %}
+        <nav class="zen-pagination">
+          <ul class="pagination">
+            {% if inbox_messages.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ inbox_messages.previous_page_number }}">Previous</a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            {% endif %}
+
+            {% for i in inbox_messages.paginator.page_range %}
+              {% if inbox_messages.number == i %}
+                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+              {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endfor %}
+
+            {% if inbox_messages.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ inbox_messages.next_page_number }}">Next</a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Next</span></li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+
+      </div>
+
+      <!-- ==================== PROCESSED TAB ==================== -->
+      <div class="tab-pane fade" id="pills-archive" role="tabpanel">
+        
+        {% for msg in processed_messages %}
+          <div class="msg-card read">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;" class="msg-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="msg-sender text-muted">{{ msg.name }}</span>
+                <span class="badge bg-light text-secondary border">Archived</span>
+              </div>
+              <div class="msg-meta">
+                {{ msg.created_at|date:"M d, Y" }}
+              </div>
+            </div>
+            <div>
+              <div class="msg-subject text-muted">{{ msg.subject }}</div>
+            </div>
+            <div class="msg-actions">
+              <button type="button" class="btn-view" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#readModal"
+                      data-id="{{ msg.id }}"
+                      data-name="{{ msg.name }}"
+                      data-email="{{ msg.email }}"
+                      data-subject="{{ msg.subject }}"
+                      data-message="{{ msg.message }}"
+                      data-date="{{ msg.created_at|date:'M d, Y H:i' }}">
+                View
+              </button>
+              <a href="{% url 'delete_message' msg.id %}" class="btn-del" onclick="return confirm('Delete this message permanently?');">
+                <i class="fa-solid fa-trash"></i> Delete
+              </a>
+            </div>
+          </div>
+        {% empty %}
+          <div class="empty-box">
+            <p>No processed messages yet.</p>
+          </div>
+        {% endfor %}
+
+        <!-- ARCHIVE PAGINATION -->
+        {% if processed_messages.has_other_pages %}
+        <nav class="zen-pagination">
+          <ul class="pagination">
+            {% if processed_messages.has_previous %}
+              <li class="page-item"><a class="page-link" href="?archive_page={{ processed_messages.previous_page_number }}">Previous</a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            {% endif %}
+
+            {% for i in processed_messages.paginator.page_range %}
+              {% if processed_messages.number == i %}
+                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+              {% else %}
+                <li class="page-item"><a class="page-link" href="?archive_page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endfor %}
+
+            {% if processed_messages.has_next %}
+              <li class="page-item"><a class="page-link" href="?archive_page={{ processed_messages.next_page_number }}">Next</a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Next</span></li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- READ & REPLY MODAL -->
+  <div class="modal fade" id="readModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow:hidden;">
+        
+        <!-- Header -->
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title fw-bold text-dark">Message Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-4 bg-light p-3 rounded">
+            <div>
+              <div class="small text-muted text-uppercase fw-bold mb-1">From</div>
+              <div class="fw-bold fs-5 text-dark" id="modalName"></div>
+              <div id="modalEmail" class="text-muted small"></div>
+            </div>
+            <div class="text-end">
+              <div class="small text-muted text-uppercase fw-bold mb-1">Date</div>
+              <div class="text-dark" id="modalDate"></div>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <span class="small text-muted text-uppercase fw-bold">Subject</span>
+            <h6 class="fw-bold text-dark mt-1" id="modalSubject"></h6>
+          </div>
+
+          <div class="mt-3 p-3 border rounded bg-white" style="max-height: 200px; overflow-y: auto;">
+            <p id="modalMessage" style="white-space: pre-wrap; line-height: 1.6; color: #334155; margin:0;"></p>
+          </div>
+          
+          <!-- Hidden ID Field -->
+          <input type="hidden" id="modalMsgId">
+        </div>
+
+        <!-- Footer: Reply Section -->
+        <div class="modal-footer flex-column align-items-stretch bg-light border-top-0 p-4">
+          
+          <!-- 1. Reply Button -->
+          <button id="btnShowReply" class="btn text-white w-100 fw-bold" style="background-color: var(--zp);">
+            <i class="fa-solid fa-reply me-2"></i> Write a Reply
+          </button>
+
+          <!-- 2. The Form (Hidden by default) -->
+          <div id="replySection" style="display: none;">
+            <label class="small fw-bold text-muted mb-2">Your Reply:</label>
+            <textarea id="replyBody" class="form-control mb-3" rows="4" placeholder="Type your response here..."></textarea>
+            
+            <div class="d-flex gap-2 justify-content-end">
+              <button type="button" id="btnCancelReply" class="btn btn-outline-secondary btn-sm">Cancel</button>
+              <button type="button" id="btnSendReply" class="btn btn-success text-white fw-bold">
+                <span id="btnText">Send Email</span>
+                <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2" style="display:none;"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Success Message -->
+          <div id="replySuccess" class="alert alert-success mt-3 mb-0" style="display:none;">
+            <i class="fa-solid fa-check-circle me-2"></i> Email sent successfully! Page will refresh.
+          </div>
+          
+          <!-- 4. Error Message -->
+          <div id="replyError" class="alert alert-danger mt-3 mb-0" style="display:none;"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      
+      const readModal = document.getElementById('readModal');
+      const bsModal = new bootstrap.Modal(readModal);
+      
+      // UI Elements
+      const replySection = document.getElementById('replySection');
+      const btnShowReply = document.getElementById('btnShowReply');
+      const replyBody = document.getElementById('replyBody');
+      const replySuccess = document.getElementById('replySuccess');
+      const replyError = document.getElementById('replyError');
+      const btnSend = document.getElementById('btnSendReply');
+      const btnSpinner = document.getElementById('btnSpinner');
+      const btnText = document.getElementById('btnText');
+
+      // 1. Populate Modal on Open
+      readModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        
+        // Reset UI
+        replySection.style.display = 'none';
+        btnShowReply.style.display = 'block';
+        replySuccess.style.display = 'none';
+        replyError.style.display = 'none';
+        replyBody.value = '';
+        btnSend.disabled = false;
+        btnText.textContent = "Send Email";
+
+        // Fill Data
+        document.getElementById('modalMsgId').value = button.getAttribute('data-id');
+        document.getElementById('modalName').textContent = button.getAttribute('data-name');
+        document.getElementById('modalEmail').textContent = button.getAttribute('data-email');
+        document.getElementById('modalSubject').textContent = button.getAttribute('data-subject');
+        document.getElementById('modalDate').textContent = button.getAttribute('data-date');
+        document.getElementById('modalMessage').textContent = button.getAttribute('data-message');
+      });
+
+      // 2. Toggle Reply Box
+      btnShowReply.addEventListener('click', () => {
+        btnShowReply.style.display = 'none';
+        replySection.style.display = 'block';
+        replyBody.focus();
+      });
+
+      document.getElementById('btnCancelReply').addEventListener('click', () => {
+        replySection.style.display = 'none';
+        btnShowReply.style.display = 'block';
+      });
+
+      // 3. Send via AJAX
+      btnSend.addEventListener('click', async () => {
+        const msgId = document.getElementById('modalMsgId').value;
+        const message = replyBody.value.trim();
+
+        if (!message) {
+          alert("Please write a message first.");
+          return;
+        }
+
+        // Loading State
+        btnSend.disabled = true;
+        btnText.textContent = "Sending...";
+        btnSpinner.style.display = "inline-block";
+        replyError.style.display = 'none';
+
+        try {
+          const response = await fetch("{% url 'api_send_reply' %}", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+              id: msgId,
+              message: message
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            replySection.style.display = 'none';
+            replySuccess.style.display = 'block';
+            
+            // Reload page to update lists after delay
+            setTimeout(() => {
+              bsModal.hide();
+              window.location.reload();
+            }, 1500);
+          } else {
+            throw new Error(data.message);
+          }
+
+        } catch (error) {
+          replyError.textContent = "Error: " + error.message;
+          replyError.style.display = 'block';
+          btnSend.disabled = false;
+          btnText.textContent = "Try Again";
+          btnSpinner.style.display = "none";
+        }
+      });
+
+      // 4. Persistence for "Processed" Tab
+      // If user clicks pagination on archive, URL has ?archive_page=X
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('archive_page')) {
+        const triggerEl = document.querySelector('#pills-archive-tab');
+        const tabInstance = new bootstrap.Tab(triggerEl);
+        tabInstance.show();
+      }
+    });
+  </script>
+
+  <!-- ==============================================
+       SECURITY SCRIPTS
+       ============================================== -->
+  <script>
+    // 1. Disable Right Click
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // 2. Disable Keyboard Shortcuts (Ctrl+U, F12, Save, Print)
+    document.onkeydown = function (e) {
+      if (e.keyCode == 123) return false; // F12
+      if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) return false; // DevTools
+      if (e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U
+      if (e.ctrlKey && e.keyCode == 83) return false; // Ctrl+S
+      if (e.ctrlKey && e.keyCode == 80) return false; // Ctrl+P
+    };
+
+    // 3. DevTools Detection & Debugger Trap
+    (function() {
+      const block = function() {
+          const start = new Date().getTime();
+          debugger; // Execution pauses here if DevTools is open
+          const end = new Date().getTime();
+      };
+      // Run check every 500ms
+      setInterval(block, 500);
+    })();
+  </script>
+</body>
+</html>

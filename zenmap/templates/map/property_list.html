@@ -1,0 +1,225 @@
+{% extends 'map/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Browse House Plans | ZenHouse{% endblock %}
+
+{% block content %}
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Essential Interactive CSS (Cannot be inline) -->
+<style>
+  :root {
+    --zp: #0f766e;
+    --zph: #115e59;
+    --za: #2dd4bf;
+    --zd: #0f172a;
+    --zb: #475569;
+    --zs: #f8fafc;
+    --zshad: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --zshad-h: 0 20px 25px -5px rgba(0,0,0,0.1);
+  }
+
+  /* Hover & Transition States */
+  .h-btn-primary:hover { background: #1e293b !important; color: #fff !important; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  .h-btn-ghost:hover { border-color: var(--zd) !important; color: var(--zd) !important; background: #f8fafc !important; }
+  .h-clear-filter:hover { text-decoration: underline; color: #dc2626 !important; }
+
+  .h-card-prop { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #e2e8f0; }
+  .h-card-prop:hover { transform: translateY(-4px); box-shadow: var(--zshad-h) !important; border-color: var(--zp) !important; }
+  
+  .h-img-zoom img { transition: transform 0.5s ease; }
+  .h-card-prop:hover .h-img-zoom img { transform: scale(1.05); }
+  
+  .h-overlay { transition: 0.3s; opacity: 0; background: rgba(15, 118, 110, 0.9); }
+  .h-card-prop:hover .h-overlay { opacity: 1 !important; }
+  
+  .h-btn-view:hover { background: #fff !important; color: var(--zp) !important; }
+
+  .h-why-card:hover { transform: translateY(-3px); border-color: var(--zp) !important; box-shadow: var(--zshad) !important; }
+
+  @media(max-width: 768px) {
+    .header-responsive { align-items: flex-start !important; flex-direction: column !important; }
+    .actions-responsive { align-items: flex-start !important; width: 100% !important; }
+    .btn-row-responsive { justify-content: flex-start !important; width: 100% !important; }
+  }
+</style>
+
+<div style="padding: 2rem 0 5rem; background: #f8fafc; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+
+    <!-- HEADER DASHBOARD -->
+    <header class="header-responsive" style="margin-bottom: 2rem; background: #fff; padding: 2rem; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: var(--zshad); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; align-items: center;">
+      
+      <!-- Left: Title -->
+      <div style="max-width: 600px;">
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; background: rgba(15, 118, 110, 0.1); color: var(--zp); border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">
+          <i class="fa-solid fa-folder-open"></i> Asset Library
+        </div>
+        <h1 style="font-size: 2rem; font-weight: 800; color: var(--zd); line-height: 1.1; margin-bottom: 0.5rem; letter-spacing: -0.02em;">House Plans</h1>
+        <div style="font-size: 0.9rem; color: #64748b; font-weight: 500;">
+          Found <strong style="color: var(--zp); font-weight: 700;">{{ properties|length }}</strong> design{% if properties|length != 1 %}s{% endif %} available for download.
+        </div>
+      </div>
+
+      <!-- Right: Actions & Filters -->
+      <div class="actions-responsive" style="display: flex; flex-direction: column; align-items: flex-end; gap: 1rem; flex-grow: 1;">
+        
+        <div class="btn-row-responsive" style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+          <a href="{% url 'pricing' %}" class="h-btn-ghost" style="background: #fff; color: var(--zb); border: 1px solid #cbd5e1; padding: 0.6rem 1.2rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.2s; text-decoration: none;">
+            <i class="fa-solid fa-coins"></i> Pricing Tiers
+          </a>
+          <a href="{% url 'contact' %}" class="h-btn-primary" style="background: var(--zd); color: #fff; padding: 0.6rem 1.2rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.2s; text-decoration: none;">
+            <i class="fa-solid fa-plus"></i> Custom Request
+          </a>
+        </div>
+
+        {% if request.GET %}
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; background: #f1f5f9; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+          <span style="text-transform: uppercase; font-size: 0.7rem; font-weight: 700; color: #94a3b8; margin-right: 0.5rem;">Active Filters:</span>
+          
+          {% if request.GET.tier %}
+            <span style="background: #fff; border: 1px solid #cbd5e1; color: var(--zd); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+              {% if request.GET.tier == 'basic' %}Basic{% elif request.GET.tier == 'standard' %}Standard{% elif request.GET.tier == 'premium' %}Premium{% else %}{{ request.GET.tier|title }}{% endif %}
+            </span>
+          {% endif %}
+          
+          {% if request.GET.category %}
+            <span style="background: #fff; border: 1px solid #cbd5e1; color: var(--zd); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">{{ request.GET.category|title }}</span>
+          {% endif %}
+          
+          {% if request.GET.bedrooms %}
+            <span style="background: #fff; border: 1px solid #cbd5e1; color: var(--zd); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">{{ request.GET.bedrooms }} Beds</span>
+          {% endif %}
+
+          {% if request.GET.q %}
+            <span style="background: #fff; border: 1px solid #cbd5e1; color: var(--zd); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">"{{ request.GET.q }}"</span>
+          {% endif %}
+
+          <a href="{% url 'property_list' %}" class="h-clear-filter" style="color: #ef4444; font-weight: 600; display: flex; align-items: center; gap: 4px; font-size: 0.75rem; margin-left: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none;">
+            <i class="fa-solid fa-xmark"></i> Clear
+          </a>
+        </div>
+        {% endif %}
+
+      </div>
+
+    </header>
+
+    {% if not properties %}
+      <div style="text-align: center; background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 4rem 2rem; margin: 2rem 0;">
+        <div style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--zd);">No Plans Found</h3>
+        <p style="color: #64748b;">We couldn't find any designs matching your specific criteria.</p>
+        <a href="{% url 'property_list' %}" class="btn btn-dark rounded-3 mt-3 px-4">Reset Filters</a>
+      </div>
+    {% endif %}
+
+    <!-- PLANS GRID -->
+    <div class="row g-4">
+      {% for property in properties %}
+      <div class="col-lg-4 col-md-6">
+        <div class="h-card-prop" style="background: #fff; border-radius: 8px; overflow: hidden; height: 100%; position: relative; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          
+          <!-- Image Section -->
+          <a href="{% url 'map_detail' property.id %}" class="h-img-zoom d-block" style="position: relative; height: 220px; overflow: hidden; background: #f1f5f9;">
+            {% if property.image %}
+              <img src="{{ property.image.url }}" alt="{{ property.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'img/placeholder-plan.jpg' %}" style="width: 100%; height: 100%; object-fit: cover; background:#e2e8f0;">
+            {% endif %}
+
+            <div style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.9); color: var(--zd); padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">{{ property.category|title }}</div>
+            <div style="position: absolute; bottom: 0; left: 0; background: rgba(15, 23, 42, 0.95); color: #fff; padding: 0.4rem 1rem; border-top-right-radius: 8px; font-size: 0.9rem; font-weight: 700; z-index: 2;">TZS {{ property.price|floatformat:0|intcomma }}</div>
+
+            <!-- Hover State -->
+            <div class="h-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem;">
+              <span class="h-btn-view" style="color: #fff; border: 1px solid #fff; padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 600; font-size: 0.9rem; transition: 0.2s;">View Details</span>
+            </div>
+          </a>
+
+          <!-- Body Section -->
+          <div style="padding: 1.2rem; flex-grow: 1; display: flex; flex-direction: column; border-top: 1px solid #f1f5f9;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <div>
+                <a href="{% url 'map_detail' property.id %}" style="font-size: 1.1rem; font-weight: 700; color: var(--zd); line-height: 1.3; display: block; margin-bottom: 0.2rem; text-decoration: none;">
+                  {{ property.title }}
+                </a>
+                <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">ID: {{ property.code }}</span>
+              </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: auto; padding-top: 1rem;">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #475569; font-weight: 500;"><i class="fas fa-bed" style="color: var(--zp); font-size: 0.9rem; width: 16px; text-align: center;"></i> {{ property.number_of_bedrooms }} Bed</div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #475569; font-weight: 500;"><i class="fas fa-bath" style="color: var(--zp); font-size: 0.9rem; width: 16px; text-align: center;"></i> {{ property.number_of_bathrooms }} Bath</div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #475569; font-weight: 500;"><i class="fas fa-layer-group" style="color: var(--zp); font-size: 0.9rem; width: 16px; text-align: center;"></i> {{ property.number_of_floors }} Flr</div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #475569; font-weight: 500;"><i class="fas fa-ruler-combined" style="color: var(--zp); font-size: 0.9rem; width: 16px; text-align: center;"></i> {{ property.square_meters|floatformat:0 }} m²</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<!-- WHY CHOOSE -->
+<section style="padding: 80px 0; background: #fff; border-top: 1px solid #e2e8f0; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+    <div class="row align-items-start g-5">
+      <div class="col-lg-4">
+        <h2 class="h2 fw-bold mb-2" style="color:var(--zd);">Why <span>ZenHouse</span>?</h2>
+        <p class="text-muted mb-3" style="font-size: 0.95rem;">
+          We combine architectural expertise, digital convenience and local understanding so you don’t have to guess.
+        </p>
+        <div style="background: var(--zd); color: #fff; padding: 1.5rem; border-radius: 8px; margin-top: 1rem; box-shadow: var(--zshad);">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: #ffc107; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">
+            <i class="fa-solid fa-star"></i> Trusted Quality
+          </div>
+          <p class="small text-white-50 mb-0">
+            Climate, regulations, materials and everyday lifestyle are considered in every plan.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <article class="h-why-card" style="height: 100%; border-radius: 8px; padding: 1.5rem; background: #ffffff; border: 1px solid #e2e8f0; transition: 0.4s;">
+              <div style="width: 40px; height: 40px; background: #f0fdfa; color: var(--zp); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;"><i class="fa-solid fa-drafting-compass"></i></div>
+              <h3 class="h6 fw-bold mb-2 text-dark">Professional Drawings</h3>
+              <p class="small text-muted mb-0">Created by real architects, ready for construction approvals.</p>
+            </article>
+          </div>
+          <div class="col-md-6">
+            <article class="h-why-card" style="height: 100%; border-radius: 8px; padding: 1.5rem; background: #ffffff; border: 1px solid #e2e8f0; transition: 0.4s;">
+              <div style="width: 40px; height: 40px; background: #f0fdfa; color: var(--zp); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;"><i class="fa-solid fa-diagram-project"></i></div>
+              <h3 class="h6 fw-bold mb-2 text-dark">Clear Process</h3>
+              <p class="small text-muted mb-0">From download to build, we guide you on every next step.</p>
+            </article>
+          </div>
+          <div class="col-md-6">
+            <article class="h-why-card" style="height: 100%; border-radius: 8px; padding: 1.5rem; background: #ffffff; border: 1px solid #e2e8f0; transition: 0.4s;">
+              <div style="width: 40px; height: 40px; background: #f0fdfa; color: var(--zp); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;"><i class="fa-solid fa-user-group"></i></div>
+              <h3 class="h6 fw-bold mb-2 text-dark">Human Support</h3>
+              <p class="small text-muted mb-0">Instant help via WhatsApp whenever you have a question.</p>
+            </article>
+          </div>
+          <div class="col-md-6">
+            <article class="h-why-card" style="height: 100%; border-radius: 8px; padding: 1.5rem; background: #ffffff; border: 1px solid #e2e8f0; transition: 0.4s;">
+              <div style="width: 40px; height: 40px; background: #f0fdfa; color: var(--zp); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;"><i class="fa-solid fa-shield-heart"></i></div>
+              <h3 class="h6 fw-bold mb-2 text-dark">Transparent</h3>
+              <p class="small text-muted mb-0">No hidden costs. What you see is exactly what you get.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

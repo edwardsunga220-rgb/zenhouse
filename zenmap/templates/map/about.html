@@ -1,0 +1,408 @@
+{% extends "map/base.html" %}
+{% load static %}
+
+{% block title %}ZenHouse – Who We Are{% endblock %}
+
+{% block content %}
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Essential Interactive Styles (Cannot be inlined) -->
+<style>
+  :root {
+    --zp: #0f766e;       /* Primary */
+    --zph: #115e59;      /* Primary Hover */
+    --za: #2dd4bf;       /* Accent */
+    --zd: #0f172a;       /* Dark */
+    --zb: #475569;       /* Body */
+    --zs: #f8fafc;       /* Soft BG */
+    --zshadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --zshadow-h: 0 20px 25px -5px rgba(0,0,0,0.1);
+  }
+
+  /* Hover Animations */
+  .h-lift { transition: 0.3s; }
+  .h-lift:hover { transform: translateY(-5px); box-shadow: var(--zshadow-h) !important; border-color: #e2e8f0; }
+  .h-lift-border:hover { border-color: var(--zp) !important; box-shadow: var(--zshadow) !important; }
+  
+  /* Team Grayscale Effect */
+  .team-img { filter: grayscale(100%); transition: 0.3s; }
+  .h-lift:hover .team-img { filter: grayscale(0%); }
+
+  /* Form Inputs Focus */
+  .zen-input:focus { outline: none; border-color: var(--zp) !important; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1); }
+  
+  /* Button Hover */
+  .zen-btn:hover { background: #1e293b !important; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+  /* FAQ Accordion Logic */
+  .faq-item { transition: 0.3s; }
+  .faq-icon { transition: 0.2s; }
+  .faq-item[open] { border-color: var(--zp) !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  .faq-item[open] summary { background: #f0fdfa !important; color: var(--zp) !important; }
+  .faq-item[open] .faq-icon { transform: rotate(90deg); color: var(--zp) !important; }
+  /* Hide default details marker */
+  summary::-webkit-details-marker { display: none; }
+
+  /* Responsive Adjustments */
+  @media (max-width: 992px) {
+    .metrics-col { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1.5rem 0 !important; }
+    .contact-split { padding: 2rem !important; border: none !important; }
+    .contact-right { border-top: 1px solid #e2e8f0 !important; }
+  }
+</style>
+
+<!-- SECTION 1: HERO -->
+<section style="padding: 10rem 0 8rem; position: relative; background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%), url('{% static 'video/commercial.webp' %}'); background-size: cover; background-position: center; font-family: 'Inter', sans-serif; text-align: center;">
+  <div class="container px-4" style="position: relative; z-index: 2;">
+    <!-- Kicker -->
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.85rem; background: rgba(15,118,110,0.1); color: var(--zp); border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1.5rem;">
+      <i class="fa-solid fa-building"></i> Company Profile
+    </div>
+    <!-- Title -->
+    <h1 style="font-size: 3rem; font-weight: 800; color: var(--zd); margin-bottom: 1rem; letter-spacing: -0.03em;">Designing the Future of Living</h1>
+    <p style="font-size: 1.35rem; line-height: 1.6; color: var(--zd); max-width: 850px; margin: 0 auto; font-weight: 600;">
+      ZenHouse connects aspiring homeowners with <strong>professional, architect-verified</strong> blueprints tailored for the modern African lifestyle.
+    </p>
+  </div>
+  <!-- Fade Overlay Bottom -->
+  <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: linear-gradient(to bottom, transparent, #fff); pointer-events: none;"></div>
+</section>
+
+<!-- SECTION 2: METRICS -->
+<div style="padding: 0 1rem; margin-top: -3rem; position: relative; z-index: 5; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+    <div style="background: var(--zd); border-radius: 8px; padding: 2.5rem; color: #fff; box-shadow: var(--zshadow-h); max-width: 1100px; margin: 0 auto;">
+      <div class="row gy-0 align-items-center">
+        <!-- Item 1 -->
+        <div class="col-md-3 col-6 metrics-col" style="text-align: center; padding: 1rem; border-right: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 2.5rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 0.2rem;"><span class="zen-counter" data-target="50">0</span>+</div>
+          <div style="font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Curated Plans</div>
+        </div>
+        <!-- Item 2 -->
+        <div class="col-md-3 col-6 metrics-col" style="text-align: center; padding: 1rem; border-right: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 2.5rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 0.2rem;"><span class="zen-counter" data-target="10">0</span>+</div>
+          <div style="font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Cities Served</div>
+        </div>
+        <!-- Item 3 -->
+        <div class="col-md-3 col-6 metrics-col" style="text-align: center; padding: 1rem; border-right: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 2.5rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 0.2rem;"><span class="zen-counter" data-target="7">0</span>+</div>
+          <div style="font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Categories</div>
+        </div>
+        <!-- Item 4 -->
+        <div class="col-md-3 col-6 metrics-col" style="text-align: center; padding: 1rem;">
+          <div style="font-size: 2.5rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 0.2rem;"><span class="zen-counter" data-target="100">0</span>%</div>
+          <div style="font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Digital Access</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: MISSION -->
+<section style="background: #fff; padding-top: 120px; padding-bottom: 80px; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+    <div class="row g-5 justify-content-center">
+      <!-- Mission -->
+      <div class="col-lg-5">
+        <div class="h-lift" style="background: var(--zs); border-radius: 8px; padding: 3rem; height: 100%; border: 1px solid #f1f5f9;">
+          <div style="width: 48px; height: 48px; background: #fff; color: var(--zp); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <i class="fa-solid fa-crosshairs"></i>
+          </div>
+          <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; color: var(--zd);">Our Mission</h3>
+          <p style="font-size: 1.05rem; color: var(--zb); line-height: 1.7;">
+            To provide a seamless digital experience for discovering, comparing and securing architectural plans — built on trust, transparency, and professional standards.
+          </p>
+        </div>
+      </div>
+      <!-- Vision -->
+      <div class="col-lg-5">
+        <div class="h-lift" style="background: var(--zs); border-radius: 8px; padding: 3rem; height: 100%; border: 1px solid #f1f5f9;">
+          <div style="width: 48px; height: 48px; background: #fff; color: var(--zp); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <i class="fa-solid fa-lightbulb"></i>
+          </div>
+          <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; color: var(--zd);">Our Vision</h3>
+          <p style="font-size: 1.05rem; color: var(--zb); line-height: 1.7;">
+            To become the leading architectural hub in Tanzania and East Africa, empowering people to build better homes through thoughtful design and technology.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: HOW IT WORKS -->
+<section style="background: #fff; padding: 100px 0; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+    <div class="text-center">
+      <h2 style="font-size: 2.5rem; font-weight: 800; color: var(--zd); margin-bottom: 1rem;">How ZenHouse Works</h2>
+      <p style="font-size: 1.15rem; color: var(--zb); max-width: 700px; margin: 0 auto 3rem;">Your journey from idea to blueprint in three simple steps.</p>
+    </div>
+
+    <div class="row g-4 mt-2">
+      <!-- Step 1 -->
+      <div class="col-md-4">
+        <div class="h-lift h-lift-border" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 2rem; height: 100%; position: relative; overflow: hidden;">
+          <!-- BG Number -->
+          <div style="position: absolute; top: -10px; right: -10px; font-size: 8rem; font-weight: 900; color: #f1f5f9; opacity: 0.5; line-height: 1; z-index: 0;">1</div>
+          <div style="position: relative; z-index: 2;">
+            <span style="display: inline-block; background: var(--zp); color: #fff; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1.2rem;">Discovery</span>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--zd);">Browse &amp; Shortlist</h3>
+            <p style="font-size: 1rem; color: var(--zb); line-height: 1.6;">Use filters to find designs that feel close to your ideal home. Save your favorites to compare.</p>
+          </div>
+        </div>
+      </div>
+      <!-- Step 2 -->
+      <div class="col-md-4">
+        <div class="h-lift h-lift-border" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 2rem; height: 100%; position: relative; overflow: hidden;">
+          <div style="position: absolute; top: -10px; right: -10px; font-size: 8rem; font-weight: 900; color: #f1f5f9; opacity: 0.5; line-height: 1; z-index: 0;">2</div>
+          <div style="position: relative; z-index: 2;">
+            <span style="display: inline-block; background: var(--zp); color: #fff; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1.2rem;">Configuration</span>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--zd);">Consult &amp; Refine</h3>
+            <p style="font-size: 1rem; color: var(--zb); line-height: 1.6;">Share your land size and requirements. We help you understand what can be adjusted.</p>
+          </div>
+        </div>
+      </div>
+      <!-- Step 3 -->
+      <div class="col-md-4">
+        <div class="h-lift h-lift-border" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 2rem; height: 100%; position: relative; overflow: hidden;">
+          <div style="position: absolute; top: -10px; right: -10px; font-size: 8rem; font-weight: 900; color: #f1f5f9; opacity: 0.5; line-height: 1; z-index: 0;">3</div>
+          <div style="position: relative; z-index: 2;">
+            <span style="display: inline-block; background: var(--zp); color: #fff; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1.2rem;">Delivery</span>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--zd);">Download &amp; Build</h3>
+            <p style="font-size: 1rem; color: var(--zb); line-height: 1.6;">Receive your digital package (PDF/CAD) and clear next steps for local approvals.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: TEAM -->
+<section style="padding: 100px 0; background: var(--zs); border-top: 1px solid #f1f5f9; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+    <div class="text-center">
+      <h2 style="font-size: 2.5rem; font-weight: 800; color: var(--zd); margin-bottom: 1rem;">Meet Our Team</h2>
+      <p style="font-size: 1.15rem; color: var(--zb); max-width: 700px; margin: 0 auto 3rem;">The creative minds shaping the future of housing.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center mt-2">
+      <!-- Team 1 -->
+      <div class="col-lg-3 col-md-6">
+        <div class="h-lift" style="background: #fff; border-radius: 8px; padding: 2rem 1.5rem; text-align: center; box-shadow: var(--zshadow);">
+          <div style="width: 140px; height: 140px; margin: 0 auto 1.5rem; position: relative;">
+            <img src="{% static 'images/team1.jpg' %}" alt="Uweza Andrew" class="team-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+          </div>
+          <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--zd); margin-bottom: 0.3rem;">Uweza Andrew</h4>
+          <p style="font-size: 0.85rem; color: var(--zp); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Founder &amp; CEO</p>
+        </div>
+      </div>
+      <!-- Team 2 -->
+      <div class="col-lg-3 col-md-6">
+        <div class="h-lift" style="background: #fff; border-radius: 8px; padding: 2rem 1.5rem; text-align: center; box-shadow: var(--zshadow);">
+          <div style="width: 140px; height: 140px; margin: 0 auto 1.5rem; position: relative;">
+            <img src="{% static 'images/team2.jpg' %}" alt="Edwards Sunga" class="team-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+          </div>
+          <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--zd); margin-bottom: 0.3rem;">Edwards Sunga</h4>
+          <p style="font-size: 0.85rem; color: var(--zp); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Product Lead</p>
+        </div>
+      </div>
+      <!-- Team 3 -->
+      <div class="col-lg-3 col-md-6">
+        <div class="h-lift" style="background: #fff; border-radius: 8px; padding: 2rem 1.5rem; text-align: center; box-shadow: var(--zshadow);">
+          <div style="width: 140px; height: 140px; margin: 0 auto 1.5rem; position: relative;">
+            <img src="{% static 'images/team3.jpg' %}" alt="Everine Andrew" class="team-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+          </div>
+          <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--zd); margin-bottom: 0.3rem;">Everine Andrew</h4>
+          <p style="font-size: 0.85rem; color: var(--zp); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Marketing Lead</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: CONTACT & FAQ -->
+<section style="padding: 100px 0 4rem; background: #fff; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+    <div style="background: #fff; border-radius: 12px; box-shadow: var(--zshadow-h); border: 1px solid #e2e8f0; overflow: hidden;" class="row g-0">
+      
+      <!-- Contact Form -->
+      <div class="col-lg-6 contact-split" style="padding: 4rem;">
+        <div class="mb-5">
+          <h2 style="font-size: 2rem; font-weight: 800; color: var(--zd); margin-bottom: 0.5rem;">Get in Touch</h2>
+          <p class="text-muted">Have a question about a plan? Send us a message.</p>
+        </div>
+
+        <form method="POST" style="font-family: 'Inter', sans-serif;">
+          {% csrf_token %}
+          <!-- Generic style targeting standard Django form output elements -->
+          <div style="margin-bottom: 1.5rem;">
+             <!-- Note: You may need to ensure your Django form renders basic HTML inputs. 
+                  The style block above (.zen-input) handles focus states if you add that class, 
+                  or standard input:focus handlers apply globally in the style block. -->
+             {{ form.as_p }}
+          </div>
+
+          <button type="submit" class="zen-btn" style="background: var(--zd); color: #fff; border: none; padding: 1rem 2.5rem; border-radius: 6px; font-weight: 700; width: 100%; margin-top: 1rem; cursor: pointer; transition: 0.3s;">
+            Send Message <i class="fa-solid fa-arrow-right ms-2"></i>
+          </button>
+        </form>
+
+        {% if success %}
+          <div class="alert alert-success mt-4 rounded-3" role="alert">
+            <i class="fa-solid fa-check-circle me-2"></i> Your message has been sent successfully.
+          </div>
+        {% elif error %}
+          <div class="alert alert-danger mt-4 rounded-3" role="alert">
+            <i class="fa-solid fa-circle-exclamation me-2"></i> Error sending message. Please try again.
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- FAQ -->
+      <div class="col-lg-6 contact-split contact-right" style="background: var(--zs); padding: 4rem; border-left: 1px solid #e2e8f0;">
+        <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--zd); margin-bottom: 1.5rem;">Common Questions</h3>
+
+        <details class="faq-item" open style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; overflow: hidden;">
+          <summary style="padding: 1.2rem; cursor: pointer; font-weight: 600; color: var(--zd); list-style: none; display: flex; justify-content: space-between; align-items: center; background: #fff;">
+            Can you customize a plan for my plot? <i class="fa-solid fa-chevron-right faq-icon" style="color: #cbd5e1;"></i>
+          </summary>
+          <div style="padding: 1.2rem; font-size: 0.95rem; color: var(--zb); line-height: 1.6; border-top: 1px solid #f1f5f9;">
+            Yes. Our team can adjust dimensions, rooms, and materials to match your land size. Share your plot details and we’ll advise.
+          </div>
+        </details>
+
+        <details class="faq-item" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; overflow: hidden;">
+          <summary style="padding: 1.2rem; cursor: pointer; font-weight: 600; color: var(--zd); list-style: none; display: flex; justify-content: space-between; align-items: center; background: #fff;">
+            What do I receive when I buy? <i class="fa-solid fa-chevron-right faq-icon" style="color: #cbd5e1;"></i>
+          </summary>
+          <div style="padding: 1.2rem; font-size: 0.95rem; color: var(--zb); line-height: 1.6; border-top: 1px solid #f1f5f9;">
+            You receive a digital package (PDF) with floor plans, elevations, and sections ready for local engineers.
+          </div>
+        </details>
+
+        <details class="faq-item" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; overflow: hidden;">
+          <summary style="padding: 1.2rem; cursor: pointer; font-weight: 600; color: var(--zd); list-style: none; display: flex; justify-content: space-between; align-items: center; background: #fff;">
+            Is ZenHouse only for Dar es Salaam? <i class="fa-solid fa-chevron-right faq-icon" style="color: #cbd5e1;"></i>
+          </summary>
+          <div style="padding: 1.2rem; font-size: 0.95rem; color: var(--zb); line-height: 1.6; border-top: 1px solid #f1f5f9;">
+            No. We serve clients all over Tanzania and East Africa. We design for you remotely based on your land info.
+          </div>
+        </details>
+
+        <div style="margin-top: 3rem; padding: 1.5rem; border-radius: 8px; background: #fff; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 1rem;">
+          <div style="width:48px; height:48px; background: #198754; color: white; display:flex; align-items:center; justify-content:center; border-radius: 6px;"><i class="fa-brands fa-whatsapp fs-4"></i></div>
+          <div>
+            <strong style="display:block; color: var(--zd);">Need instant answers?</strong>
+            <a href="https://wa.me/255749422626" style="text-decoration: none; font-size: 0.85rem; color: #6c757d;">Chat with us on WhatsApp</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 7: WHY CHOOSE -->
+<section style="background: #fff; padding: 100px 0; border-top: 1px solid #f1f5f9; font-family: 'Inter', sans-serif;">
+  <div class="container px-4">
+    <div class="row align-items-start g-5">
+      <div class="col-lg-4">
+        <h2 style="font-size: 2.5rem; font-weight: 800; color: var(--zd); margin-bottom: 1rem;">Why <span>ZenHouse</span>?</h2>
+        <p style="font-size: 1.15rem; color: var(--zb); margin-bottom: 2rem;">We combine architectural expertise, digital convenience, and local understanding.</p>
+
+        <div class="h-lift" style="background: var(--zd); color: #fff; padding: 2rem; border-radius: 8px; margin-top: 2rem; box-shadow: var(--zshadow-h);">
+          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.85rem; background: #fff; color: var(--zd); border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1rem;">
+            <i class="fa-solid fa-star text-warning"></i> Built for East Africa
+          </div>
+          <p style="margin-bottom: 0; opacity: 0.8; line-height: 1.6;">
+            Climate, regulations, materials and everyday lifestyle are part of every plan we publish.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="row g-4">
+          <!-- Item 1 -->
+          <div class="col-md-6">
+            <article class="h-lift h-lift-border" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; height: 100%;">
+              <div style="width: 40px; height: 40px; background: #f0fdfa; color: var(--zp); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;"><i class="fa-solid fa-drafting-compass"></i></div>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--zd);">Professional Drawings</h3>
+              <p style="font-size: 1rem; color: var(--zb); margin: 0;">Plans created by experienced architects, not random sketches.</p>
+            </article>
+          </div>
+          <!-- Item 2 -->
+          <div class="col-md-6">
+            <article class="h-lift h-lift-border" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; height: 100%;">
+              <div style="width: 40px; height: 40px; background: #f0fdfa; color: var(--zp); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;"><i class="fa-solid fa-diagram-project"></i></div>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--zd);">Clear Next Steps</h3>
+              <p style="font-size: 1rem; color: var(--zb); margin: 0;">Guidance on approvals and construction after download.</p>
+            </article>
+          </div>
+          <!-- Item 3 -->
+          <div class="col-md-6">
+            <article class="h-lift h-lift-border" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; height: 100%;">
+              <div style="width: 40px; height: 40px; background: #f0fdfa; color: var(--zp); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;"><i class="fa-solid fa-user-group"></i></div>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--zd);">Human Support</h3>
+              <p style="font-size: 1rem; color: var(--zb); margin: 0;">Talk to our team on WhatsApp or phone whenever you need clarity.</p>
+            </article>
+          </div>
+          <!-- Item 4 -->
+          <div class="col-md-6">
+            <article class="h-lift h-lift-border" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; height: 100%;">
+              <div style="width: 40px; height: 40px; background: #f0fdfa; color: var(--zp); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;"><i class="fa-solid fa-shield-heart"></i></div>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--zd);">Trust &amp; Transparency</h3>
+              <p style="font-size: 1rem; color: var(--zb); margin: 0;">No hidden surprises. We explain exactly what you get.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Number Counter Animation
+    const counters = document.querySelectorAll(".zen-counter");
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const counter = entry.target;
+          const target = +counter.getAttribute("data-target");
+          const increment = target / (2000 / 16); 
+          let current = 0;
+          const updateCount = () => {
+            current += increment;
+            if (current < target) {
+              counter.innerText = Math.ceil(current);
+              requestAnimationFrame(updateCount);
+            } else {
+              counter.innerText = target;
+            }
+          };
+          updateCount();
+          obs.unobserve(counter);
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    counters.forEach(c => observer.observe(c));
+    
+    // Auto-Style Django Form Inputs if not using a widget library
+    const formInputs = document.querySelectorAll('.contact-split input, .contact-split textarea, .contact-split select');
+    formInputs.forEach(input => {
+        input.classList.add('zen-input'); // Adds the focus ring style defined in CSS
+        input.style.width = "100%";
+        input.style.padding = "0.9rem 1rem";
+        input.style.borderRadius = "6px";
+        input.style.border = "1px solid #cbd5e1";
+        input.style.marginBottom = "1rem";
+    });
+  });
+</script>
+{% endblock %}

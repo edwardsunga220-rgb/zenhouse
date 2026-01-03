@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Login | ZenHouse Professional</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="{% static 'video/z.jpg' %}">
+
+  <!-- Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --zp: #0f766e;
+      --zd: #0f172a;
+      --zb: #334155;
+      --zrad: 8px;
+    }
+
+    /* Layout & Backgrounds */
+    body { font-family: 'Inter', system-ui, sans-serif; margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; display: flex; background: #fff; color: var(--zb); -webkit-user-select: none; user-select: none; }
+    
+    input { -webkit-user-select: text; user-select: text; }
+
+    .brand-pane {
+      background-image: url("{% static 'video/lx4.jpeg' %}"); background-size: cover; background-position: center; position: relative;
+    }
+    .brand-pane::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(15, 23, 42, 0.3), rgba(15, 23, 42, 0.8)); z-index: 1; }
+
+    /* Interactive States (Cannot be inline) */
+    .h-back-link:hover { color: var(--zd) !important; }
+    
+    .h-input:focus { outline: none; border-color: var(--zp) !important; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1); }
+    .h-input:focus + .input-icon { color: var(--zp) !important; }
+    
+    .h-btn-submit:hover { background: #1e293b !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .h-link:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .brand-pane { display: none !important; }
+      .form-pane { flex: 1; max-width: 100% !important; padding: 2rem !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div style="display: flex; width: 100%; height: 100%;">
+    
+    <!-- LEFT: Brand Experience -->
+    <div class="brand-pane" style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 4rem; color: #fff;">
+      <div style="position: relative; z-index: 2; max-width: 550px; width: 100%;">
+        <!-- Brand Card: Brighter & Centered -->
+        <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.3); padding: 3rem; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);">
+          <div style="font-size: 2rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; letter-spacing: -0.02em; text-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+            "The most intuitive platform for accessing professional architectural drawings."
+          </div>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+             <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; font-size: 1rem; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+               <i class="fa-solid fa-check-circle" style="color: #2dd4bf; font-size: 1.2rem;"></i> Instant PDF downloads
+             </li>
+             <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; font-size: 1rem; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+               <i class="fa-solid fa-check-circle" style="color: #2dd4bf; font-size: 1.2rem;"></i> Secure project dashboard
+             </li>
+             <li style="display: flex; align-items: center; gap: 12px; font-size: 1rem; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+               <i class="fa-solid fa-check-circle" style="color: #2dd4bf; font-size: 1.2rem;"></i> Direct architect support
+             </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Login Form -->
+    <div class="form-pane" style="flex: 1; min-width: 450px; max-width: 650px; background: #fff; display: flex; flex-direction: column; position: relative; padding: 4rem; overflow-y: auto;">
+      
+      <!-- Top Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem;">
+        <div style="font-weight: 800; font-size: 1.2rem; color: var(--zd); display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-layer-group" style="color:var(--zp);"></i> ZenHouse
+        </div>
+        <a href="{% url 'home' %}" class="h-back-link" style="color: #64748b; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: 0.2s;">
+          Back to Site <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- Auth Container -->
+      <div style="width: 100%; max-width: 400px; margin: auto;">
+        
+        <div style="margin-bottom: 2.5rem;">
+          <h1 style="font-size: 2rem; font-weight: 800; color: var(--zd); margin: 0 0 0.5rem; letter-spacing: -0.03em;">Log in</h1>
+          <p style="color: #64748b; font-size: 1rem; margin: 0;">Enter your credentials to access your dashboard.</p>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <div>{{ form.non_field_errors|join:", " }}</div>
+          </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+          {% endif %}
+
+          <!-- Email -->
+          <div style="margin-bottom: 1.5rem;">
+            <label for="{{ form.username.id_for_label }}" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--zd); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Email</label>
+            <div style="position: relative;">
+              <input 
+                type="email" 
+                name="{{ form.username.name }}" 
+                id="{{ form.username.id_for_label }}" 
+                class="h-input" 
+                placeholder="name@example.com" 
+                value="{{ form.username.value|default_if_none:'' }}"
+                required
+                style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.6rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; color: var(--zd); transition: all 0.2s; background: #fff; font-family: 'Inter', sans-serif;">
+              <i class="fa-regular fa-envelope input-icon" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1rem; transition: 0.2s;"></i>
+            </div>
+            {% if form.username.errors %}
+              <div style="color:#ef4444; font-size:0.8rem; margin-top:5px; font-weight:500;">
+                {{ form.username.errors|join:", " }}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Password -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <label for="{{ form.password.id_for_label }}" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--zd); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Password</label>
+            </div>
+            <div style="position: relative;">
+              <input 
+                type="password" 
+                name="{{ form.password.name }}" 
+                id="{{ form.password.id_for_label }}" 
+                class="h-input" 
+                placeholder="••••••••" 
+                required
+                style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.6rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; color: var(--zd); transition: all 0.2s; background: #fff; font-family: 'Inter', sans-serif;">
+              <i class="fa-solid fa-lock input-icon" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1rem; transition: 0.2s;"></i>
+            </div>
+            {% if form.password.errors %}
+              <div style="color:#ef4444; font-size:0.8rem; margin-top:5px; font-weight:500;">
+                {{ form.password.errors|join:", " }}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="h-btn-submit" style="width: 100%; background: var(--zd); color: #fff; border: none; padding: 0.9rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 1rem;">
+            Sign In
+          </button>
+
+        </form>
+
+        <div style="margin-top: 2rem; text-align: center; font-size: 0.9rem; color: #64748b;">
+          New to ZenHouse? <a href="#" class="h-link" style="color: var(--zp); text-decoration: none; font-weight: 700;">Create an account</a>
+        </div>
+
+      </div>
+      <!-- End Auth Container -->
+
+    </div>
+  </div>
+
+  <!-- ==============================================
+       SECURITY SCRIPTS
+       ============================================== -->
+  <script>
+    // 1. Disable Right Click
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // 2. Disable Keyboard Shortcuts (Ctrl+U, F12, Save, Print)
+    document.onkeydown = function (e) {
+      if (e.keyCode == 123) return false; // F12
+      if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) return false; // DevTools
+      if (e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U
+      if (e.ctrlKey && e.keyCode == 83) return false; // Ctrl+S
+      if (e.ctrlKey && e.keyCode == 80) return false; // Ctrl+P
+    };
+
+    // 3. DevTools Detection & Debugger Trap
+    (function() {
+      const block = function() {
+          const start = new Date().getTime();
+          debugger; // Execution pauses here if DevTools is open
+          const end = new Date().getTime();
+      };
+      // Run check every 500ms
+      setInterval(block, 500);
+    })();
+  </script>
+
+</body>
+</html>

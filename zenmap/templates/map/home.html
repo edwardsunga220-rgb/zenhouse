@@ -1,0 +1,434 @@
+{% extends "map/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<!-- ==============================================
+     ASSETS & RESOURCES
+     ============================================== -->
+
+<!-- Google Fonts: Inter -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Minimal CSS for Animations, Hovers & Media Queries (Cannot be inlined) -->
+<style>
+  /* Animations */
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(45, 212, 191, 0); } 100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); } }
+  .hero-kicker-dot { animation: pulse 2s infinite; }
+  
+  /* Scrollbar Hiding */
+  .latest-track-wrapper::-webkit-scrollbar { display: none; }
+  
+  /* Hover Effects (Inline styles cannot handle :hover) */
+  .btn-zen-primary:hover { transform: translateY(-2px); background: #ffffff !important; color: #0d9488 !important; box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important; }
+  .btn-zen-ghost:hover { background: rgba(255, 255, 255, 0.2) !important; border-color: #fff !important; }
+  .step-card:hover .step-num { background: #0d9488 !important; color: #fff !important; transform: scale(1.1); }
+  .plan-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1) !important; }
+  .plan-card:hover .plan-img-wrap img { transform: scale(1.05); }
+  .collection-card:hover { border-color: #2dd4bf !important; background: #e0f2fe !important; transform: translateY(-3px); }
+  .cat-card:hover img { transform: scale(1.05); filter: brightness(1) !important; }
+  .slider-controls button:hover { background: #0f172a !important; color: #fff !important; border-color: #0f172a !important; }
+  .cta-outline-btn:hover { background: #fff !important; color: #0d9488 !important; border-color: #fff !important; }
+
+  /* Media Queries for Mobile Layouts */
+  @media(max-width: 768px) {
+    .hero-zenhouse { padding-top: 100px !important; min-height: auto !important; padding-bottom: 4rem !important; display: block !important; }
+    .hero-actions { flex-direction: column; width: 100%; }
+    .hero-metrics { justify-content: space-between; gap: 1rem !important; }
+    .trust-bar .container { justify-content: center !important; }
+  }
+</style>
+
+<div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; line-height: 1.6; color: #475569; background-color: #f8fafc; -webkit-font-smoothing: antialiased;">
+
+  <!-- ==============================================
+       HERO SECTION
+       ============================================== -->
+  <section class="hero-zenhouse" style="position: relative; min-height: 85vh; background-image: linear-gradient(135deg, rgba(2, 6, 23, 0.85), rgba(13, 148, 136, 0.6)), url('{% static 'video/bg_1.jpg' %}'); background-size: cover; background-position: center; color: #fff; display: flex; align-items: center; overflow: hidden;">
+    <div class="hero-inner w-100" style="position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 2rem 1rem;">
+      <div class="row align-items-center">
+        <div class="col-lg-9">
+          
+          <!-- Kicker Badge -->
+          <div class="hero-kicker" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; backdrop-filter: blur(8px); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; margin-bottom: 1.5rem;">
+            <span class="hero-kicker-dot" style="width: 8px; height: 8px; background: #5eead4; border-radius: 50%; box-shadow: 0 0 10px #5eead4;"></span>
+            <span>#1 Modern Plan Database</span>
+          </div>
+
+          <!-- Main Title with Rotating Text -->
+          <h1 class="hero-main-title" style="font-size: clamp(3rem, 5vw, 4.5rem); line-height: 1.1; font-weight: 800; margin-bottom: 1.5rem; color: #ffffff; letter-spacing: -0.03em; text-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+            <span>Designing Dreams, <br> Building</span>
+            <span class="word-rotator-wrapper" style="display: inline-block; height: 1.2em; overflow: hidden; vertical-align: bottom; color: #5eead4; position: relative;">
+              <ul class="word-rotator-list" id="wordList" style="list-style: none; padding: 0; margin: 0; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                <li class="word-rotator-item" style="height: 1.2em; display: flex; align-items: center; background: linear-gradient(to right, #5eead4, #ccfbf1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Unique Spaces.</li>
+                <li class="word-rotator-item" style="height: 1.2em; display: flex; align-items: center; background: linear-gradient(to right, #5eead4, #ccfbf1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Modern Homes.</li>
+                <li class="word-rotator-item" style="height: 1.2em; display: flex; align-items: center; background: linear-gradient(to right, #5eead4, #ccfbf1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Smart Investments.</li>
+                <li class="word-rotator-item" style="height: 1.2em; display: flex; align-items: center; background: linear-gradient(to right, #5eead4, #ccfbf1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Better Futures.</li>
+              </ul>
+            </span>
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="hero-subtitle" style="font-size: 1.25rem; color: #f1f5f9; max-width: 650px; margin-bottom: 2.5rem; line-height: 1.6; font-weight: 400;">
+            Discover <strong>ZenHouse</strong> — carefully curated, architect-designed house plans tailored for the East African lifestyle. From compact city homes to expansive villas.
+          </p>
+
+          <!-- CTAs -->
+          <div class="hero-actions" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem;">
+            <a href="{% url 'property_list' %}" class="btn-zen-primary" style="background: #2dd4bf; color: #0f172a; padding: 1rem 2.2rem; border-radius: 8px; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 15px rgba(45, 212, 191, 0.4); border: none; transition: all 0.2s ease; text-decoration: none; display: inline-flex; align-items: center;">
+              <i class="fas fa-layer-group me-2"></i> Browse Plans
+            </a>
+            <a href="https://vimeo.com/45830194" class="btn-zen-ghost" style="background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); padding: 1rem 2.2rem; border-radius: 8px; font-weight: 600; transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center;">
+              <i class="fas fa-play me-2"></i> How it Works
+            </a>
+          </div>
+
+          <!-- Metrics -->
+          <div class="hero-metrics" style="display: flex; gap: 4rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 2rem;">
+            <div class="metric-item">
+              <strong style="display: block; font-size: 2rem; color: #fff; line-height: 1; font-weight: 700; margin-bottom: 0.25rem;">200+</strong>
+              <span style="font-size: 0.85rem; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Premium Plans</span>
+            </div>
+            <div class="metric-item">
+              <strong style="display: block; font-size: 2rem; color: #fff; line-height: 1; font-weight: 700; margin-bottom: 0.25rem;">3D</strong>
+              <span style="font-size: 0.85rem; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Visualizations</span>
+            </div>
+            <div class="metric-item">
+              <strong style="display: block; font-size: 2rem; color: #fff; line-height: 1; font-weight: 700; margin-bottom: 0.25rem;">TZ</strong>
+              <span style="font-size: 0.85rem; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Locally Adapted</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================================
+       TRUST INDICATORS BAR
+       ============================================== -->
+  <div class="trust-bar" style="background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 1.5rem 0; font-size: 0.95rem; color: #475569; font-weight: 500;">
+    <div class="container d-flex flex-wrap justify-content-center justify-content-md-between gap-3">
+      <div class="trust-item" style="display: inline-flex; align-items: center; gap: 0.6rem;"><i class="fa-solid fa-check-circle" style="color: #0d9488; font-size: 1.1rem;"></i> Vetted Architectural Designs</div>
+      <div class="trust-item" style="display: inline-flex; align-items: center; gap: 0.6rem;"><i class="fa-solid fa-location-dot" style="color: #0d9488; font-size: 1.1rem;"></i> Designed for Local Context</div>
+      <div class="trust-item" style="display: inline-flex; align-items: center; gap: 0.6rem;"><i class="fa-brands fa-whatsapp" style="color: #0d9488; font-size: 1.1rem;"></i> Instant Support</div>
+    </div>
+  </div>
+
+  <!-- ==============================================
+       HOW IT WORKS SECTION
+       ============================================== -->
+  <section class="zen-section how-section" style="padding: 90px 0; position: relative; background: #ffffff;">
+    <div class="container px-4">
+      <div class="section-header text-center" style="margin-bottom: 3.5rem;">
+        <h2 class="section-title" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.75rem; color: #0f172a; background: linear-gradient(135deg, #0f172a 20%, #0d9488 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;">How It Works</h2>
+        <p class="section-subtitle" style="font-size: 1.125rem; color: #64748b; max-width: 650px; font-weight: 400; margin: 0 auto;">Three simple steps to move from an idea to a construction-ready project.</p>
+      </div>
+
+      <div class="row g-5">
+        <!-- Step 1 -->
+        <div class="col-md-4">
+          <article class="step-card" style="background: #fff; border: none; border-radius: 8px; padding: 0; height: 100%; transition: all 0.3s ease;">
+            <div class="step-num" style="background: #ccfbf1; color: #0f766e; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; margin-bottom: 1.5rem; transition: 0.3s;">1</div>
+            <h3 class="step-title" style="font-size: 1.25rem; margin-bottom: 0.75rem; font-weight: 700; color: #0f172a;">Explore &amp; Shortlist</h3>
+            <p class="step-text" style="color: #475569; font-size: 1rem; line-height: 1.7;">Use our filters to find plans by bedrooms, plot size, or budget. Save your favorites to compare.</p>
+          </article>
+        </div>
+        <!-- Step 2 -->
+        <div class="col-md-4">
+          <article class="step-card" style="background: #fff; border: none; border-radius: 8px; padding: 0; height: 100%; transition: all 0.3s ease;">
+            <div class="step-num" style="background: #ccfbf1; color: #0f766e; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; margin-bottom: 1.5rem; transition: 0.3s;">2</div>
+            <h3 class="step-title" style="font-size: 1.25rem; margin-bottom: 0.75rem; font-weight: 700; color: #0f172a;">Consult &amp; Customize</h3>
+            <p class="step-text" style="color: #475569; font-size: 1rem; line-height: 1.7;">Talk to our experts. We can adjust any plan to fit your specific plot shape or family needs.</p>
+          </article>
+        </div>
+        <!-- Step 3 -->
+        <div class="col-md-4">
+          <article class="step-card" style="background: #fff; border: none; border-radius: 8px; padding: 0; height: 100%; transition: all 0.3s ease;">
+            <div class="step-num" style="background: #ccfbf1; color: #0f766e; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; margin-bottom: 1.5rem; transition: 0.3s;">3</div>
+            <h3 class="step-title" style="font-size: 1.25rem; margin-bottom: 0.75rem; font-weight: 700; color: #0f172a;">Download &amp; Build</h3>
+            <p class="step-text" style="color: #475569; font-size: 1rem; line-height: 1.7;">Get the complete architectural drawings (PDF/CAD) instantly and start construction with confidence.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================================
+       LATEST PLANS SLIDER
+       ============================================== -->
+  <section class="zen-section latest-section" style="padding: 90px 0; position: relative; background: #f0fdfa; overflow: hidden;">
+    <div class="container px-4">
+      
+      <!-- Section Header & Controls -->
+      <div class="d-flex align-items-end justify-content-between mb-5">
+        <div>
+          <h2 class="section-title mb-1" style="font-size: 2.5rem; font-weight: 800; color: #0f172a; background: linear-gradient(135deg, #0f172a 20%, #0d9488 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;">Fresh Designs</h2>
+          <p class="section-subtitle mb-0" style="font-size: 1.125rem; color: #64748b; font-weight: 400;">The latest additions to our curated collection.</p>
+        </div>
+        <div class="slider-controls d-flex gap-2">
+          <button type="button" id="slideLeft" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; display: flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><i class="fa-solid fa-arrow-left"></i></button>
+          <button type="button" id="slideRight" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; display: flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Scrollable Track -->
+      <div class="latest-track-wrapper" style="overflow-x: auto; scroll-behavior: smooth; padding: 1rem 0 2.5rem; scrollbar-width: none;">
+        <div class="latest-track" id="latestTrack" style="display: flex; gap: 2rem;">
+          {% for map in recent_maps %}
+          <a href="{% url 'map_detail' map.id %}" class="latest-item" style="min-width: 340px; flex: 0 0 340px; text-decoration: none; color: inherit;">
+            <div class="plan-card" style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column; border: 1px solid #e2e8f0;">
+              <div class="plan-img-wrap" style="height: 240px; position: relative; overflow: hidden;">
+                {% if map.image %}
+                  <img src="{{ map.image.url }}" alt="{{ map.title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease;">
+                {% else %}
+                  <img src="{% static 'img/placeholder.jpg' %}" alt="No Image" style="width: 100%; height: 100%; object-fit: cover; background:#ddd;">
+                {% endif %}
+                
+                {% if map.price %}
+                  <div class="price-tag" style="position: absolute; bottom: 1rem; left: 1rem; background: #ffffff; color: #0f172a; padding: 0.35rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">TZS {{ map.price|floatformat:0|intcomma }}</div>
+                {% endif %}
+              </div>
+              
+              <div class="plan-info" style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                <div class="plan-cat" style="font-size: 0.75rem; text-transform: uppercase; color: #0d9488; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.75rem;">{{ map.get_category_display }}</div>
+                <h3 class="plan-title" style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; color: #0f172a;">{{ map.title }}</h3>
+                
+                <div class="plan-specs" style="display: flex; gap: 1.2rem; font-size: 0.9rem; color: #64748b; margin-top: auto; padding-top: 1.25rem; border-top: 1px solid #f1f5f9;">
+                  {% if map.number_of_bedrooms %}
+                    <span style="display: flex; align-items: center; gap: 0.4rem;"><i class="fa-solid fa-bed" style="color: #94a3b8; font-size: 1rem;"></i> {{ map.number_of_bedrooms }}</span>
+                  {% endif %}
+                  {% if map.number_of_bathrooms %}
+                    <span style="display: flex; align-items: center; gap: 0.4rem;"><i class="fa-solid fa-bath" style="color: #94a3b8; font-size: 1rem;"></i> {{ map.number_of_bathrooms }}</span>
+                  {% endif %}
+                  {% if map.square_meters %}
+                    <span style="display: flex; align-items: center; gap: 0.4rem;"><i class="fa-solid fa-ruler-combined" style="color: #94a3b8; font-size: 1rem;"></i> {{ map.square_meters }} m²</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </a>
+          {% empty %}
+            <p class="text-muted ms-3">No plans currently available.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==============================================
+       COLLECTIONS (BENTO GRID)
+       ============================================== -->
+  <section class="zen-section collections-section" style="padding: 90px 0; position: relative; background: #fff;">
+    <div class="container px-4">
+      <div class="section-header" style="margin-bottom: 3.5rem; text-align: left;">
+        <h2 class="section-title" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.75rem; color: #0f172a; background: linear-gradient(135deg, #0f172a 20%, #0d9488 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;">Find Your Perfect Fit</h2>
+        <p class="section-subtitle" style="font-size: 1.125rem; color: #64748b; max-width: 650px; font-weight: 400;">Browse collections designed for specific goals.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Collection 1 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="collection-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 2.5rem; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; transition: 0.3s; text-decoration: none;">
+            <div>
+              <div class="col-icon" style="width: 56px; height: 56px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0d9488; font-size: 1.4rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"><i class="fa-solid fa-house-chimney"></i></div>
+              <h4 style="color: #0f172a; font-weight: 700; margin-bottom: 0.5rem;">Starter Homes</h4>
+              <p class="text-muted small mt-2" style="color: #94a3b8;">Efficient, cost-effective designs perfect for first-time builders and small plots.</p>
+            </div>
+            <a href="{% url 'property_list' %}?sqm=under_100" class="col-link" style="margin-top: 2rem; font-weight: 700; color: #0d9488; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; text-decoration: none;">
+              View Plans <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Collection 2 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="collection-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 2.5rem; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; transition: 0.3s; text-decoration: none;">
+            <div>
+              <div class="col-icon" style="width: 56px; height: 56px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0d9488; font-size: 1.4rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"><i class="fa-solid fa-people-roof"></i></div>
+              <h4 style="color: #0f172a; font-weight: 700; margin-bottom: 0.5rem;">Modern Villas</h4>
+              <p class="text-muted small mt-2" style="color: #94a3b8;">Spacious layouts with ensuite bedrooms, family halls, and modern aesthetics.</p>
+            </div>
+            <a href="{% url 'property_list' %}?category=villa" class="col-link" style="margin-top: 2rem; font-weight: 700; color: #0d9488; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; text-decoration: none;">
+              View Villas <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Collection 3 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="collection-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 2.5rem; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; transition: 0.3s; text-decoration: none;">
+            <div>
+              <div class="col-icon" style="width: 56px; height: 56px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0d9488; font-size: 1.4rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"><i class="fa-solid fa-chart-line"></i></div>
+              <h4 style="color: #0f172a; font-weight: 700; margin-bottom: 0.5rem;">Investment & Rentals</h4>
+              <p class="text-muted small mt-2" style="color: #94a3b8;">Apartments and multi-unit designs optimized for rental income generation.</p>
+            </div>
+            <a href="{% url 'property_list' %}?category=apartments" class="col-link" style="margin-top: 2rem; font-weight: 700; color: #0d9488; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; text-decoration: none;">
+              View Investment Plans <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================================
+       CATEGORIES SECTION
+       ============================================== -->
+  <section class="zen-section categories-section" style="padding: 100px 0; background: #ffffff;">
+    <div class="container px-4">
+      <div class="section-header d-flex align-items-end justify-content-between" style="margin-bottom: 3.5rem;">
+        <div>
+          <h2 class="section-title" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.75rem; color: #0f172a; background: linear-gradient(135deg, #0f172a 20%, #0d9488 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;">Categories</h2>
+          <p class="section-subtitle" style="font-size: 1.125rem; color: #64748b; font-weight: 400;">Explore our full library by type.</p>
+        </div>
+        <a href="{% url 'property_list' %}" class="text-primary small text-decoration-underline fw-bold" style="color: #0d9488 !important; font-weight: 700;">View All</a>
+      </div>
+
+      <div class="row g-4">
+        {% for cat in categories %}
+        <div class="col-lg-3 col-6">
+          <a href="{% url 'property_list' %}?category={{ cat.slug }}" class="cat-card" style="position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 4/3; display: block; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: 0.3s; text-decoration: none;">
+            {% if cat.image %}
+              <img src="{{ cat.image }}" alt="{{ cat.name }}" style="width: 100%; height: 100%; object-fit: cover; transition: 0.6s; filter: brightness(0.9);">
+            {% else %}
+              <img src="{% static 'img/cat-placeholder.jpg' %}" style="width: 100%; height: 100%; object-fit: cover; transition: 0.6s; background:#f1f5f9; filter: brightness(0.9);">
+            {% endif %}
+            <div class="cat-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, transparent 80%); display: flex; flex-direction: column; justify-content: flex-end; padding: 1.5rem;">
+              <h4 class="cat-name" style="color: #fff; font-size: 1.35rem; margin: 0; font-weight: 700;">{{ cat.name }}</h4>
+              <div class="cat-count" style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-top: 0.2rem;">Browse {{ cat.total_plans|default:"all" }} plans</div>
+            </div>
+          </a>
+        </div>
+        {% empty %}
+        <p class="text-muted">Categories loading...</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================================
+       WHY CHOOSE US
+       ============================================== -->
+  <section class="zen-section why-section" style="padding: 90px 0; position: relative; background: #f0fdfa;">
+    <div class="container px-4">
+      <div class="row align-items-center g-5">
+        
+        <!-- Highlight Box -->
+        <div class="col-lg-5">
+          <div class="why-highlight" style="background: #0f172a; color: #fff; padding: 3rem; border-radius: 12px; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.25);">
+            <h3 class="text-white mb-3" style="font-weight: 700; color: #fff;">Why ZenHouse?</h3>
+            <p class="text-white-50 mb-0" style="font-size: 1.05rem; line-height: 1.7; color: rgba(255,255,255,0.7);">
+              We don't just sell drawings; we provide the blueprint for your future. Our plans are crafted to meet Tanzanian building codes and climatic conditions.
+            </p>
+            <hr class="border-secondary my-4" style="border-color: rgba(255,255,255,0.2) !important;">
+            <div class="d-flex align-items-center gap-3">
+              <div class="h2 text-white mb-0 fw-bold" style="color: #fff; font-weight: 700; font-size: 2rem;">100%</div>
+              <div class="small text-white-50" style="color: rgba(255,255,255,0.7);">Satisfaction Guarantee<br>on design quality.</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Feature List -->
+        <div class="col-lg-7">
+          <div class="row">
+            <div class="col-md-6 feature-item" style="display: flex; gap: 1.25rem; margin-bottom: 2.5rem;">
+              <div class="feature-icon" style="width: 48px; height: 48px; flex-shrink: 0; background: #fff; color: #0d9488; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><i class="fa-solid fa-ruler-combined"></i></div>
+              <div class="feature-content">
+                <h4 style="font-size: 1.15rem; margin-bottom: 0.4rem; font-weight: 700; color: #0f172a;">Detailed Dimensions</h4>
+                <p style="font-size: 1rem; color: #475569; line-height: 1.6; margin: 0;">Every plan comes with accurate measurements to help you estimate costs.</p>
+              </div>
+            </div>
+            <div class="col-md-6 feature-item" style="display: flex; gap: 1.25rem; margin-bottom: 2.5rem;">
+              <div class="feature-icon" style="width: 48px; height: 48px; flex-shrink: 0; background: #fff; color: #0d9488; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><i class="fa-solid fa-file-pdf"></i></div>
+              <div class="feature-content">
+                <h4 style="font-size: 1.15rem; margin-bottom: 0.4rem; font-weight: 700; color: #0f172a;">Instant PDF Access</h4>
+                <p style="font-size: 1rem; color: #475569; line-height: 1.6; margin: 0;">No waiting. Download your preliminary drawings immediately after purchase.</p>
+              </div>
+            </div>
+            <div class="col-md-6 feature-item" style="display: flex; gap: 1.25rem; margin-bottom: 2.5rem;">
+              <div class="feature-icon" style="width: 48px; height: 48px; flex-shrink: 0; background: #fff; color: #0d9488; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><i class="fa-solid fa-user-tie"></i></div>
+              <div class="feature-content">
+                <h4 style="font-size: 1.15rem; margin-bottom: 0.4rem; font-weight: 700; color: #0f172a;">Expert Support</h4>
+                <p style="font-size: 1rem; color: #475569; line-height: 1.6; margin: 0;">Direct line to our architects for modifications and site advice.</p>
+              </div>
+            </div>
+            <div class="col-md-6 feature-item" style="display: flex; gap: 1.25rem; margin-bottom: 2.5rem;">
+              <div class="feature-icon" style="width: 48px; height: 48px; flex-shrink: 0; background: #fff; color: #0d9488; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><i class="fa-solid fa-sack-dollar"></i></div>
+              <div class="feature-content">
+                <h4 style="font-size: 1.15rem; margin-bottom: 0.4rem; font-weight: 700; color: #0f172a;">Transparent Pricing</h4>
+                <p style="font-size: 1rem; color: #475569; line-height: 1.6; margin: 0;">Affordable, flat-rate pricing for high-quality architectural work.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================================
+       CALL TO ACTION STRIP
+       ============================================== -->
+  <section class="cta-strip" style="background: #0d9488; padding: 4rem 0;">
+    <div class="container px-4">
+      <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 text-center text-md-start">
+        <div>
+          <h3 class="h3 mb-2 text-white" style="color: #fff; font-weight: 700;">Need a Custom Design?</h3>
+          <p class="mb-0 text-white-50 fs-5" style="color: rgba(255,255,255,0.8); font-size: 1.25rem;">We can design from scratch based on your plot and vision.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="https://wa.me/255749422626" target="_blank" class="cta-outline-btn" style="border: 2px solid rgba(255,255,255,0.4); color: #fff; padding: 0.8rem 1.8rem; border-radius: 6px; font-weight: 700; transition: 0.2s; text-decoration: none;">
+            <i class="fa-brands fa-whatsapp me-2"></i> Chat Now
+          </a>
+          <a href="{% url 'contact' %}" class="cta-outline-btn" style="background: #fff; color: #0d9488; border: 2px solid #fff; padding: 0.8rem 1.8rem; border-radius: 6px; font-weight: 700; transition: 0.2s; text-decoration: none;">
+            Request Quote
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ==============================================
+     PAGE INTERACTIVITY
+     ============================================== -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    // 1. Hero Word Rotator (Vertical Slide Animation)
+    const list = document.getElementById("wordList");
+    if(list) {
+      let idx = 0;
+      const count = list.children.length;
+      setInterval(() => {
+        idx = (idx + 1) % count;
+        list.style.transform = `translateY(-${idx * 1.2}em)`;
+      }, 2500);
+    }
+
+    // 2. Latest Plans - Horizontal Scroll Buttons
+    const track = document.getElementById("latestTrack");
+    const btnLeft = document.getElementById("slideLeft");
+    const btnRight = document.getElementById("slideRight");
+
+    if (track && btnLeft && btnRight) {
+      const scrollAmt = 370; // Approximation of Card Width + Gap
+
+      btnLeft.addEventListener("click", function() {
+        track.scrollBy({ left: -scrollAmt, behavior: "smooth" });
+      });
+
+      btnRight.addEventListener("click", function() {
+        track.scrollBy({ left: scrollAmt, behavior: "smooth" });
+      });
+    }
+  });
+</script>
+
+{% endblock %}
